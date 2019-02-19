@@ -8,6 +8,9 @@ import tas_fa18.Model.Badge;
 import org.junit.*;
 import static org.junit.Assert.*;
 
+
+//discord bot test
+
 public class Feature1 {
 
     private TASDatabase db;

@@ -5,8 +5,6 @@ import tas_fa18.TASDatabase;
 import tas_fa18.Punch;
 import tas_fa18.Badge;
 
-//discord bot test
-
 import org.junit.*;
 import static org.junit.Assert.*;
 

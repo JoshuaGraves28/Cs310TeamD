@@ -7,19 +7,10 @@ package tas_fa18;
 
 /**
  *
- * @author Jacob
+ * @author jdewi
  */
-public class Model {
-    public class TASDatabase {
-    
+public class Badge {
+    public Badge(){
+        
     }
-    public class Shift {
-    
-    }
-    public class Badge {
-    
-    }
-    public class Punch {
-    
-    }   
 }

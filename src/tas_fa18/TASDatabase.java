@@ -65,7 +65,6 @@ public class TASDatabase {
                         metadata = resultset.getMetaData();
                         columnCount = metadata.getColumnCount();
                         /* Get Data; Print as Table Rows */
-                        int currentLine = 0;
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
                             for (int i = 2; i <= columnCount; i++){
@@ -95,7 +94,6 @@ public class TASDatabase {
                         metadata = resultset.getMetaData();
                         columnCount = metadata.getColumnCount();
                         /* Get Data; Print as Table Rows */
-                        int currentLine = 0;
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
                             for (int i = 2; i <= columnCount; i++){
@@ -124,10 +122,9 @@ public class TASDatabase {
                         metadata = resultset.getMetaData();
                         columnCount = metadata.getColumnCount();
                         /* Get Data; Print as Table Rows */
-                        int currentLine = 0;
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
-                            for (int i = 2; i <= columnCount; i++){
+                            for (int i = 1; i <= columnCount; i++){
                                 currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
                             }
                             badgesData.add(currentJSONObject);
@@ -141,6 +138,9 @@ public class TASDatabase {
                     /* Check for More Data */
                     hasresults = pstSelect.getMoreResults();
                 }
+                System.out.println(punchesData.get(0));
+                System.out.println(badgesData.get(0));
+                System.out.println(shiftsData.get(0));
             }
             
             /* Close Database Connection */

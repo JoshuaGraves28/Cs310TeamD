@@ -11,19 +11,19 @@ package tas_fa18;
  */
 public class Punch {
     
-    private String badgeId;
+    private Badge employeeBadge;
     private int punchType;
     private int terminalId;
     private long originalTimeStamp;
     
-    public Punch(String badgeId, int terminalId, int punchType, long originalTimeStamp){
-        badgeId = this.badgeId;
-        punchType = this.punchType;
-        terminalId = this.terminalId;
-        originalTimeStamp = this.originalTimeStamp;
+    public Punch(Badge employeeBadges, int terminalId, int punchType, long originalTimeStamp){
+        this.employeeBadge = employeeBadge;
+        this.punchType = punchType;
+        this.terminalId = terminalId;
+        this.originalTimeStamp = originalTimeStamp;
     }
     
     public long printOriginalTimestamp() {
-        return originalTimeStamp;
+        return this.originalTimeStamp;
     }
 }

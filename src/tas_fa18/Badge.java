@@ -14,7 +14,13 @@ public class Badge {
     private String id;
     
     public Badge(String employeeName, String id){
-        employeeName = this.employeeName;
-        id = this.id;
+        this.employeeName = employeeName;
+        this.id = id;
+    }
+    
+    @Override
+    public String toString(){
+        String info = this.employeeName + " " + this.id;
+        return info;
     }
 }

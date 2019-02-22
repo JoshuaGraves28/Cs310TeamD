@@ -13,6 +13,7 @@ import java.util.GregorianCalendar;
  * @author jdewi
  */
 public class TASDatabase {
+    
     public TASDatabase(){
         JSONArray badgesData = new JSONArray();
         JSONArray punchesData = new JSONArray();
@@ -52,7 +53,33 @@ public class TASDatabase {
                 /* Connection Open! */
                 
                 System.out.println("Connected Successfully!");
-                
+                query = "SELECT * FROM badge";
+                pstSelect = conn.prepareStatement(query);
+                hasresults = pstSelect.execute();
+                /*Execute Selet Query*/
+                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
+                    if ( hasresults ) {
+                        /* Get ResultSet Metadata */
+                        resultset = pstSelect.getResultSet();
+                        /* Get Data; Print as Table Rows */
+                        while(resultset.next()) {
+                            JSONObject currentJSONObject = new JSONObject();
+                            Badge currentEmployee;
+                            
+                            currentEmployee = new Badge(resultset.getString(2), resultset.getString(1));
+                               
+                            
+                            badgesData.add(currentEmployee);
+                        }
+                    } else {
+                        resultCount = pstSelect.getUpdateCount();
+                        if ( resultCount == -1 ) {
+                            break;
+                        }
+                    }
+                    /* Check for More Data */
+                    hasresults = pstSelect.getMoreResults();
+                }
                 /* Prepare Select Punch Query */
                 query = "SELECT * FROM punch";
                 pstSelect = conn.prepareStatement(query);
@@ -110,38 +137,11 @@ public class TASDatabase {
                     /* Check for More Data */
                     hasresults = pstSelect.getMoreResults();
                 }
-                
-                query = "SELECT * FROM badge";
-                pstSelect = conn.prepareStatement(query);
-                hasresults = pstSelect.execute();
-                /*Execute Selet Query*/
-                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
-                    if ( hasresults ) {
-                        /* Get ResultSet Metadata */
-                        resultset = pstSelect.getResultSet();
-                        metadata = resultset.getMetaData();
-                        columnCount = metadata.getColumnCount();
-                        /* Get Data; Print as Table Rows */
-                        while(resultset.next()) {
-                            JSONObject currentJSONObject = new JSONObject();
-                            for (int i = 1; i <= columnCount; i++){
-                                currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
-                            }
-                            badgesData.add(currentJSONObject);
-                        }
-                    } else {
-                        resultCount = pstSelect.getUpdateCount();
-                        if ( resultCount == -1 ) {
-                            break;
-                        }
-                    }
-                    /* Check for More Data */
-                    hasresults = pstSelect.getMoreResults();
-                }
             }
             System.out.println(shiftsData.get(0));
             System.out.println(punchesData.get(0));
-            System.out.println(badgesData.get(0));
+            Badge test = (Badge)badgesData.get(0);
+            System.out.println(test.toString());
             /* Close Database Connection */
             
             conn.close();
@@ -172,8 +172,8 @@ public class TASDatabase {
     }
     
     public Punch getPunch(int punchTime){
-        
-        Punch returningNull = new Punch("", 0, 0, 0);
+        Badge employeeBadge = new Badge("", "");
+        Punch returningNull = new Punch(employeeBadge, 0, 0, 0);
         return returningNull;
     }
     

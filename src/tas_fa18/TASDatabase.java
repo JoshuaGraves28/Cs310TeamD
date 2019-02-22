@@ -138,9 +138,6 @@ public class TASDatabase {
                     /* Check for More Data */
                     hasresults = pstSelect.getMoreResults();
                 }
-                System.out.println(punchesData.get(0));
-                System.out.println(badgesData.get(0));
-                System.out.println(shiftsData.get(0));
             }
             
             /* Close Database Connection */
@@ -168,13 +165,13 @@ public class TASDatabase {
     
     public Badge getBadge(String badgeNumber) {
         
-       Badge returningNull = new Badge();
+       Badge returningNull = new Badge("", "");
        return returningNull;
     }
     
     public Punch getPunch(int punchTime){
         
-        Punch returningNull = new Punch(0);
+        Punch returningNull = new Punch("", 0, 0, 0);
         return returningNull;
     }
     

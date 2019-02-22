@@ -12,6 +12,7 @@ package tas_fa18;
 public class Badge {
     private String employeeName;
     private String id;
+    
     public Badge(String employeeName, String id){
         employeeName = this.employeeName;
         id = this.id;

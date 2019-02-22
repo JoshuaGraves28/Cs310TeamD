@@ -7,7 +7,7 @@ package tas_fa18;
 
 import java.sql.*;
 import org.json.simple.*;
-
+import java.util.GregorianCalendar;
 /**
  *
  * @author jdewi
@@ -67,7 +67,7 @@ public class TASDatabase {
                         /* Get Data; Print as Table Rows */
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
-                            for (int i = 2; i <= columnCount; i++){
+                            for (int i = 1; i <= columnCount; i++){
                                 currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
                             }
                             punchesData.add(currentJSONObject);
@@ -96,7 +96,7 @@ public class TASDatabase {
                         /* Get Data; Print as Table Rows */
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
-                            for (int i = 2; i <= columnCount; i++){
+                            for (int i = 1; i <= columnCount; i++){
                                 currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
                             }
                             shiftsData.add(currentJSONObject);
@@ -139,7 +139,9 @@ public class TASDatabase {
                     hasresults = pstSelect.getMoreResults();
                 }
             }
-            
+            System.out.println(shiftsData.get(0));
+            System.out.println(punchesData.get(0));
+            System.out.println(badgesData.get(0));
             /* Close Database Connection */
             
             conn.close();

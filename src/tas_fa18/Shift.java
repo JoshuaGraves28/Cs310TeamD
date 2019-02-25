@@ -11,8 +11,18 @@ package tas_fa18;
  */
 public class Shift {
     
-    public Shift(){
+    private String description;
+    private String start;
+    private String stop;
+    private String lunchStart;
+    private String lunchStop;
+    
+    public Shift(String description, String start, String stop, String lunchStart, String lunchStop){
         
     }
     
+    @Override 
+    public String toString(){
+        
+    }
 }

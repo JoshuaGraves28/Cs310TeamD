@@ -14,7 +14,8 @@ import org.json.simple.*;
 public class TASDatabase {
     JSONObject badgesData = new JSONObject();
     JSONObject punchesData = new JSONObject();
-    JSONArray shiftsData = new JSONArray();
+    JSONObject shiftsData = new JSONObject();
+    JSONObject shiftsBadgeData = new JSONObject();
         
     public TASDatabase(){
         
@@ -127,7 +128,8 @@ public class TASDatabase {
                 
                 
                 /*Prepare Select Shift Query*/
-                query = "SELECT * FROM shift";
+                JSONArray rawShiftsData = new JSONArray();
+                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute FROM shift";
                 pstSelect = conn.prepareStatement(query);
                 hasresults = pstSelect.execute();
                 /*Execute Selet Query*/
@@ -141,9 +143,9 @@ public class TASDatabase {
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
                             for (int i = 1; i <= columnCount; i++){
-                                currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
+                                currentJSONObject.put(metadata.getColumnLabel(i), resultset.getInt(i));
                             }
-                            this.shiftsData.add(currentJSONObject);
+                            rawShiftsData.add(currentJSONObject);
                         }
                     } else {
                         resultCount = pstSelect.getUpdateCount();
@@ -154,10 +156,12 @@ public class TASDatabase {
                     /* Check for More Data */
                     hasresults = pstSelect.getMoreResults();
                 }
+                for (int i = 0; i < rawShiftsData.size(); i++){
+                    JSONObject currentShift = (JSONObject)rawShiftsData.get(i);
+                    
+                }
             }
-            //System.out.println(this.shiftsData.get(0));
-            Punch testPunch = (Punch)this.punchesData.get(3325);
-            System.out.println(testPunch.printOriginalTimestamp());
+            System.out.println(this.shiftsData.get(0));
 
             /* Close Database Connection */
             

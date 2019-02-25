@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package tas_fa18;
+import java.text.*;
 import java.util.*;
 /**
  *
@@ -26,15 +27,16 @@ public class Punch {
     public String printOriginalTimestamp() {
         String punchResults = "";
         GregorianCalendar calendar = new GregorianCalendar();
-        Date date = new Date();
-        calendar.setTimeInMillis(originalTimeStamp);
-        date.setTime(originalTimeStamp);
+        calendar.setTimeInMillis(this.originalTimeStamp);
+        Date date = calendar.getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("E MM/dd/yyyy HH:mm:ss");  
+        String strDate = formatter.format(date);
         switch(this.punchType){
             case 0:
-                punchResults = " CLOCKED IN:";
+                punchResults = " CLOCKED OUT:";
                 break;
             case 1:
-                punchResults = " CLOCKED OUT:";
+                punchResults = " CLOCKED IN:";
                 break;
             case 2:
                 punchResults = " TIMED OUT:";
@@ -42,7 +44,8 @@ public class Punch {
             default:
                 System.out.println("Error");
         }
-        String originalTimestampString = "#" + this.employeeBadge.getId() + punchResults;
+        
+        String originalTimestampString = "#" + this.employeeBadge.getId() + punchResults + " " + strDate.toUpperCase();
         return originalTimestampString;
     }
 }

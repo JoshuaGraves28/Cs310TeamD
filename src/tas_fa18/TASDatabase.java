@@ -7,7 +7,6 @@ package tas_fa18;
 
 import java.sql.*;
 import org.json.simple.*;
-import java.util.GregorianCalendar;
 /**
  *
  * @author jdewi
@@ -93,7 +92,17 @@ public class TASDatabase {
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
                             for (int i = 1; i <= columnCount; i++){
-                                currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
+                                if (metadata.getColumnLabel(i).equals("unixtimestamp")){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (long)(resultset.getLong(i)*1000));
+                                } else if (metadata.getColumnLabel(i).equals("id")) {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getInt(i)));
+                                } else if (metadata.getColumnLabel(i).equals("terminalid")) {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getInt(i)));
+                                } else if (metadata.getColumnLabel(i).equals("punchtypeid")) {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getInt(i)));
+                                }else {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
+                                }
                             }
                             rawPunchesData.add(currentJSONObject);
                         }
@@ -107,14 +116,15 @@ public class TASDatabase {
                     hasresults = pstSelect.getMoreResults();
                 }
                 //Code for seting up punch data
-                /*
+                
                 for (int i = 0; i < rawPunchesData.size(); i++) {
-                    JSONObject currentPunch = (JSONObject)rawPunchesData.get(0);
-                    Badge badgeToStore = getBadge((String)currentPunch.get("badgeid"));
-                    long originalTimeToStore
-                    Punch toBeStoredPunch = new Punch(badgeToStore, (int)currentPunch.get("terminalid"), (int)currentPunch.get("punchtype"), );
+                    JSONObject currentPunch = (JSONObject)rawPunchesData.get(i);
+                    Badge badgeToStore = (Badge)this.badgesData.get((String)currentPunch.get("badgeid"));
+                    long originalTimeToStore = (long)currentPunch.get("unixtimestamp");
+                    Punch toBeStoredPunch = new Punch(badgeToStore, (int)currentPunch.get("terminalid"), (int)currentPunch.get("punchtypeid"), originalTimeToStore);
+                    punchesData.put((int)currentPunch.get("id"), (Punch)toBeStoredPunch);
                 }
-                */
+                
                 
                 /*Prepare Select Shift Query*/
                 query = "SELECT * FROM shift";
@@ -145,8 +155,10 @@ public class TASDatabase {
                     hasresults = pstSelect.getMoreResults();
                 }
             }
-            System.out.println(this.shiftsData.get(0));
-            System.out.println(this.punchesData.get(0));
+            //System.out.println(this.shiftsData.get(0));
+            Punch testPunch = (Punch)this.punchesData.get(3325);
+            System.out.println(testPunch.printOriginalTimestamp());
+
             /* Close Database Connection */
             
             conn.close();
@@ -176,12 +188,9 @@ public class TASDatabase {
        return returningBadge;
     }
     
-    public Punch getPunch(int punchTime){
-        
-        //Punch returningPunch = (Punch)this.punchesData.get(punchTime);
-        Badge employeeBadge = new Badge("", "");
-        Punch returningNull = new Punch(employeeBadge, 0, 0, 0);
-        return returningNull;
+    public Punch getPunch(int punchId){
+        Punch returningPunch = (Punch)this.punchesData.get(punchId);
+        return returningPunch;
     }
     
     public Shift getShift(int badgenumber) {

@@ -18,6 +18,14 @@ public class Badge {
         this.id = id;
     }
     
+    public String getEmployeeName(){
+        return this.employeeName;
+    }
+    
+    public String getId() {
+        return this.id;
+    }
+    
     @Override
     public String toString(){
         String info = "#" + this.id + " (" + this.employeeName + ")";

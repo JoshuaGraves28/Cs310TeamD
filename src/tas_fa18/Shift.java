@@ -13,14 +13,14 @@ import java.time.*;
  */
 public class Shift {
     
-    private int shiftType;
+    private int shiftId;
     private LocalTime start;
     private LocalTime stop;
     private LocalTime lunchStart;
     private LocalTime lunchStop;
     
-    public Shift(int shiftType, LocalTime start, LocalTime stop, LocalTime lunchStart, LocalTime lunchStop){
-        this.shiftType = shiftType;
+    public Shift(int shiftId, LocalTime start, LocalTime stop, LocalTime lunchStart, LocalTime lunchStop){
+        this.shiftId = shiftId;
         this.start = start;
         this.stop = stop;
         this.lunchStart = lunchStart;
@@ -34,7 +34,11 @@ public class Shift {
     @Override 
     public String toString(){
         String returningString = "";
-        returningString = "Shift " + this.shiftType + ": " + this.start;
-        return "test";
+        String shiftType = "";
+        String startStopTime = this.start.toString() + " - " + this.stop.toString() + " (" + Duration.between(this.start, this.stop).toMinutes();
+        String lunchStartStopTime = this.lunchStart.toString() + " - " + this.lunchStop.toString() + " (" + Duration.between(this.lunchStart, this.lunchStop).toMinutes();
+        returningString = "Shift " + this.shiftId + ": " + startStopTime + " minutes); Lunch: ";
+        System.out.println(returningString);
+        return returningString;
     }
 }

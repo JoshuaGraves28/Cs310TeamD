@@ -13,11 +13,12 @@ import java.util.GregorianCalendar;
  * @author jdewi
  */
 public class TASDatabase {
-    
+    JSONObject badgesData = new JSONObject();
+    JSONObject punchesData = new JSONObject();
+    JSONArray shiftsData = new JSONArray();
+        
     public TASDatabase(){
-        JSONArray badgesData = new JSONArray();
-        JSONArray punchesData = new JSONArray();
-        JSONArray shiftsData = new JSONArray();
+        
         Connection conn = null;
         PreparedStatement pstSelect = null, pstUpdate = null;
         ResultSet resultset = null;
@@ -63,13 +64,9 @@ public class TASDatabase {
                         resultset = pstSelect.getResultSet();
                         /* Get Data; Print as Table Rows */
                         while(resultset.next()) {
-                            JSONObject currentJSONObject = new JSONObject();
                             Badge currentEmployee;
-                            
                             currentEmployee = new Badge(resultset.getString(2), resultset.getString(1));
-                               
-                            
-                            badgesData.add(currentEmployee);
+                            this.badgesData.put(resultset.getString(1), currentEmployee);
                         }
                     } else {
                         resultCount = pstSelect.getUpdateCount();
@@ -81,9 +78,10 @@ public class TASDatabase {
                     hasresults = pstSelect.getMoreResults();
                 }
                 /* Prepare Select Punch Query */
-                query = "SELECT * FROM punch";
+                query = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) AS unixtimestamp FROM punch";
                 pstSelect = conn.prepareStatement(query);
                 hasresults = pstSelect.execute();
+                JSONArray rawPunchesData = new JSONArray();
                 /*Execute Selet Query*/
                 while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
                     if ( hasresults ) {
@@ -97,7 +95,7 @@ public class TASDatabase {
                             for (int i = 1; i <= columnCount; i++){
                                 currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
                             }
-                            punchesData.add(currentJSONObject);
+                            rawPunchesData.add(currentJSONObject);
                         }
                     } else {
                         resultCount = pstSelect.getUpdateCount();
@@ -108,6 +106,15 @@ public class TASDatabase {
                     /* Check for More Data */
                     hasresults = pstSelect.getMoreResults();
                 }
+                //Code for seting up punch data
+                /*
+                for (int i = 0; i < rawPunchesData.size(); i++) {
+                    JSONObject currentPunch = (JSONObject)rawPunchesData.get(0);
+                    Badge badgeToStore = getBadge((String)currentPunch.get("badgeid"));
+                    long originalTimeToStore
+                    Punch toBeStoredPunch = new Punch(badgeToStore, (int)currentPunch.get("terminalid"), (int)currentPunch.get("punchtype"), );
+                }
+                */
                 
                 /*Prepare Select Shift Query*/
                 query = "SELECT * FROM shift";
@@ -126,7 +133,7 @@ public class TASDatabase {
                             for (int i = 1; i <= columnCount; i++){
                                 currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
                             }
-                            shiftsData.add(currentJSONObject);
+                            this.shiftsData.add(currentJSONObject);
                         }
                     } else {
                         resultCount = pstSelect.getUpdateCount();
@@ -138,10 +145,8 @@ public class TASDatabase {
                     hasresults = pstSelect.getMoreResults();
                 }
             }
-            System.out.println(shiftsData.get(0));
-            System.out.println(punchesData.get(0));
-            Badge test = (Badge)badgesData.get(0);
-            System.out.println(test.toString());
+            System.out.println(this.shiftsData.get(0));
+            System.out.println(this.punchesData.get(0));
             /* Close Database Connection */
             
             conn.close();
@@ -167,11 +172,13 @@ public class TASDatabase {
     
     public Badge getBadge(String badgeNumber) {
         
-       Badge returningNull = new Badge("", "");
-       return returningNull;
+       Badge returningBadge = (Badge)this.badgesData.get(badgeNumber);
+       return returningBadge;
     }
     
     public Punch getPunch(int punchTime){
+        
+        //Punch returningPunch = (Punch)this.punchesData.get(punchTime);
         Badge employeeBadge = new Badge("", "");
         Punch returningNull = new Punch(employeeBadge, 0, 0, 0);
         return returningNull;

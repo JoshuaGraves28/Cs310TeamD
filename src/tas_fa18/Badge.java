@@ -20,7 +20,7 @@ public class Badge {
     
     @Override
     public String toString(){
-        String info = this.employeeName + " " + this.id;
+        String info = "#" + this.id + " (" + this.employeeName + ")";
         return info;
     }
 }

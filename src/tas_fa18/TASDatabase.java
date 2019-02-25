@@ -7,6 +7,7 @@ package tas_fa18;
 
 import java.sql.*;
 import org.json.simple.*;
+import java.time.*;
 /**
  *
  * @author jdewi
@@ -129,7 +130,7 @@ public class TASDatabase {
                 
                 /*Prepare Select Shift Query*/
                 JSONArray rawShiftsData = new JSONArray();
-                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute FROM shift";
+                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute, id FROM shift";
                 pstSelect = conn.prepareStatement(query);
                 hasresults = pstSelect.execute();
                 /*Execute Selet Query*/
@@ -158,10 +159,14 @@ public class TASDatabase {
                 }
                 for (int i = 0; i < rawShiftsData.size(); i++){
                     JSONObject currentShift = (JSONObject)rawShiftsData.get(i);
-                    
+                    LocalTime start = LocalTime.of((int)currentShift.get("starthour"), (int)currentShift.get("startminute"));
+                    LocalTime stop = LocalTime.of((int)currentShift.get("stophour"), (int)currentShift.get("stopminute"));
+                    LocalTime lunchStart = LocalTime.of((int)currentShift.get("lunchstarthour"), (int)currentShift.get("lunchstartminute"));
+                    LocalTime lunchStop = LocalTime.of((int)currentShift.get("lunchstophour"), (int)currentShift.get("lunchstopminute"));
+                    Shift returningShift = new Shift((int)currentShift.get("id"), start, stop, lunchStart, lunchStop);
+                    shiftsData.put((int)currentShift.get("id"), returningShift);
                 }
             }
-            System.out.println(this.shiftsData.get(0));
 
             /* Close Database Connection */
             
@@ -197,10 +202,10 @@ public class TASDatabase {
         return returningPunch;
     }
     
-    public Shift getShift(int badgenumber) {
+    public Shift getShift(int shiftId) {
         
-        Shift returningNull = new Shift();
-        return returningNull;
+        Shift returningShift = (Shift)shiftsData.get(shiftId);
+        return returningShift;
     }
     
     public Shift getShift(Badge testBadge) {

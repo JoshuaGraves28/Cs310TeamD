@@ -5,24 +5,36 @@
  */
 package tas_fa18;
 
+import java.time.*;
+
 /**
  *
  * @author jdewi
  */
 public class Shift {
     
-    private String description;
-    private String start;
-    private String stop;
-    private String lunchStart;
-    private String lunchStop;
+    private int shiftType;
+    private LocalTime start;
+    private LocalTime stop;
+    private LocalTime lunchStart;
+    private LocalTime lunchStop;
     
-    public Shift(String description, String start, String stop, String lunchStart, String lunchStop){
+    public Shift(int shiftType, LocalTime start, LocalTime stop, LocalTime lunchStart, LocalTime lunchStop){
+        this.shiftType = shiftType;
+        this.start = start;
+        this.stop = stop;
+        this.lunchStart = lunchStart;
+        this.lunchStop = lunchStop;
+    }
+    
+    public Shift(){
         
     }
     
     @Override 
     public String toString(){
-        
+        String returningString = "";
+        returningString = "Shift " + this.shiftType + ": " + this.start;
+        return "test";
     }
 }

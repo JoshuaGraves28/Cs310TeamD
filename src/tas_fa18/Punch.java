@@ -77,4 +77,8 @@ public class Punch {
         String originalTimestampString = "#" + this.employeeBadge.getId() + punchResults + " " + strDate.toUpperCase();
         return originalTimestampString;
     }
+    
+    public void adjust(Shift s) {
+        
+    }
 }

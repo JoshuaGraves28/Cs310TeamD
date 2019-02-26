@@ -17,6 +17,7 @@ import java.util.*;
 public class TASDatabase {
     JSONObject badgesData = new JSONObject();
     JSONObject punchesData = new JSONObject();
+    JSONObject punchTypeData = new JSONObject();
     JSONObject shiftsData = new JSONObject();
     JSONObject shiftsBadgeData = new JSONObject();
     int lowestPunchId = 0;
@@ -82,6 +83,44 @@ public class TASDatabase {
                     /* Check for More Data */
                     hasresults = pstSelect.getMoreResults();
                 }
+                query = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) AS unixtimestamp FROM punch";
+                pstSelect = conn.prepareStatement(query);
+                hasresults = pstSelect.execute();
+                JSONArray rawPunchTypeData = new JSONArray();
+                /*Execute Selet Query*/
+                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
+                    if ( hasresults ) {
+                        /* Get ResultSet Metadata */
+                        resultset = pstSelect.getResultSet();
+                        metadata = resultset.getMetaData();
+                        columnCount = metadata.getColumnCount();
+                        /* Get Data; Print as Table Rows */
+                        while(resultset.next()) {
+                            JSONObject currentJSONObject = new JSONObject();
+                            for (int i = 1; i <= columnCount; i++){
+                                if (metadata.getColumnLabel(i).equals("id")){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getInt(i)));
+                                } else {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (String)(resultset.getString(i)));
+                                }
+                            }
+                            rawPunchTypeData.add(currentJSONObject);
+                        }
+                    } else {
+                        resultCount = pstSelect.getUpdateCount();
+                        if ( resultCount == -1 ) {
+                            break;
+                        }
+                    }
+                    /* Check for More Data */
+                    hasresults = pstSelect.getMoreResults();
+                }
+                
+                for (int i = 0; i < rawPunchTypeData.size(); i++) {
+                    JSONObject currentPunchType = (JSONObject)rawPunchTypeData.get(i);
+                    this.punchTypeData.put(currentPunchType.get("id"), currentPunchType.get("description"));
+                }
+                
                 /* Prepare Select Punch Query */
                 query = "SELECT *, UNIX_TIMESTAMP(originaltimestamp) AS unixtimestamp FROM punch";
                 pstSelect = conn.prepareStatement(query);

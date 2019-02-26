@@ -24,6 +24,35 @@ public class Punch {
         this.originalTimeStamp = originalTimeStamp;
     }
     
+    public Punch(Badge employeeBadges, int terminalId, int punchType) {
+        this.employeeBadge = employeeBadges;
+        this.punchType = punchType;
+        this.terminalId = terminalId;
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.getTime();
+        this.originalTimeStamp = calendar.getTimeInMillis();
+    }
+    
+    public String getBadgeid() {
+        String returningString = (String)employeeBadge.getId();
+        return returningString;
+    }
+    
+    public int getTerminalid() {
+        int returningInt = this.terminalId;
+        return returningInt;
+    }
+    
+    public int getPunchtypeid() {
+        int returningInt = this.punchType;
+        return returningInt;
+    }
+    
+    public long getOriginaltimestamp() {
+        long returningLong = this.originalTimeStamp;
+        return returningLong;
+    }
+    
     public String printOriginalTimestamp() {
         String punchResults = "";
         GregorianCalendar calendar = new GregorianCalendar();

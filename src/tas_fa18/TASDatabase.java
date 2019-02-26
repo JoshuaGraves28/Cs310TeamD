@@ -8,6 +8,7 @@ package tas_fa18;
 import java.sql.*;
 import org.json.simple.*;
 import java.time.*;
+import java.util.*;
 /**
  *
  * @author jdewi
@@ -17,7 +18,8 @@ public class TASDatabase {
     JSONObject punchesData = new JSONObject();
     JSONObject shiftsData = new JSONObject();
     JSONObject shiftsBadgeData = new JSONObject();
-        
+    int greatestPunchId = 0;
+    
     public TASDatabase(){
         
         Connection conn = null;
@@ -118,12 +120,16 @@ public class TASDatabase {
                     hasresults = pstSelect.getMoreResults();
                 }
                 //Code for seting up punch data
-                
+                JSONObject maxIdPull = (JSONObject)rawPunchesData.get(0);
+                this.greatestPunchId = (int)maxIdPull.get("id");
                 for (int i = 0; i < rawPunchesData.size(); i++) {
                     JSONObject currentPunch = (JSONObject)rawPunchesData.get(i);
                     Badge badgeToStore = (Badge)this.badgesData.get((String)currentPunch.get("badgeid"));
                     long originalTimeToStore = (long)currentPunch.get("unixtimestamp");
                     Punch toBeStoredPunch = new Punch(badgeToStore, (int)currentPunch.get("terminalid"), (int)currentPunch.get("punchtypeid"), originalTimeToStore);
+                    if ((int)currentPunch.get("id") > this.greatestPunchId) {
+                        this.greatestPunchId = (int)currentPunch.get("id");
+                    }
                     punchesData.put((int)currentPunch.get("id"), (Punch)toBeStoredPunch);
                 }
                 
@@ -254,5 +260,16 @@ public class TASDatabase {
         int shiftId = (int)this.shiftsBadgeData.get((String)testBadge.getId());
         Shift returningShift = (Shift)this.shiftsData.get(shiftId);
         return returningShift;
+    }
+    
+    public int insertPunch(Punch punchToBeInserted) {
+        this.greatestPunchId++;
+        this.punchesData.put(this.greatestPunchId, punchToBeInserted);
+        return this.greatestPunchId;
+    }
+    
+    public ArrayList getDailyPunchList(Badge b, long ts) {
+        
+        return null;
     }
 }

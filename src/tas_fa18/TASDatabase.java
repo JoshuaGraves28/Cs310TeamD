@@ -6,6 +6,7 @@
 package tas_fa18;
 
 import java.sql.*;
+import java.text.*;
 import org.json.simple.*;
 import java.time.*;
 import java.util.*;
@@ -18,6 +19,7 @@ public class TASDatabase {
     JSONObject punchesData = new JSONObject();
     JSONObject shiftsData = new JSONObject();
     JSONObject shiftsBadgeData = new JSONObject();
+    int lowestPunchId = 0;
     int greatestPunchId = 0;
     
     public TASDatabase(){
@@ -121,7 +123,8 @@ public class TASDatabase {
                 }
                 //Code for seting up punch data
                 JSONObject maxIdPull = (JSONObject)rawPunchesData.get(0);
-                this.greatestPunchId = (int)maxIdPull.get("id");
+                this.lowestPunchId = (int)maxIdPull.get("id");
+                this.greatestPunchId = this.lowestPunchId;
                 for (int i = 0; i < rawPunchesData.size(); i++) {
                     JSONObject currentPunch = (JSONObject)rawPunchesData.get(i);
                     Badge badgeToStore = (Badge)this.badgesData.get((String)currentPunch.get("badgeid"));
@@ -269,7 +272,25 @@ public class TASDatabase {
     }
     
     public ArrayList getDailyPunchList(Badge b, long ts) {
-        
-        return null;
+        ArrayList<Punch> returningPunchList = new ArrayList();
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        GregorianCalendar calendarToCheckWith = new GregorianCalendar();
+        calendarToCheckWith.setTimeInMillis(ts);
+        java.util.Date dateToCheckWith = calendarToCheckWith.getTime();
+        for (int i = 0; i < this.punchesData.size(); i++){
+            if (this.punchesData.containsKey(this.lowestPunchId + i)){
+                Punch currentPunch = (Punch)this.punchesData.get(this.lowestPunchId + i);
+                String currentPunchBadgeId = (String)currentPunch.getBadgeid();
+                if (currentPunchBadgeId.equals((String)b.getId())){
+                    GregorianCalendar calendarOfCurrentPunch = new GregorianCalendar();
+                    calendarOfCurrentPunch.setTimeInMillis(currentPunch.getOriginaltimestamp());
+                    java.util.Date currentPunchDate = calendarOfCurrentPunch.getTime();
+                    if (fmt.format(dateToCheckWith).equals(fmt.format(currentPunchDate))){
+                        returningPunchList.add(currentPunch);
+                    }
+                }
+            }
+        }
+        return returningPunchList;
     }
 }

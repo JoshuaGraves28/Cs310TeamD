@@ -127,10 +127,8 @@ public class TASDatabase {
                     punchesData.put((int)currentPunch.get("id"), (Punch)toBeStoredPunch);
                 }
                 
-                
-                /*Prepare Select Shift Query*/
-                JSONArray rawShiftsData = new JSONArray();
-                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute, id FROM shift";
+                JSONArray rawEmployeeData = new JSONArray();
+                query = "Select badgeid, shiftid FROM employee";
                 pstSelect = conn.prepareStatement(query);
                 hasresults = pstSelect.execute();
                 /*Execute Selet Query*/
@@ -144,7 +142,50 @@ public class TASDatabase {
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
                             for (int i = 1; i <= columnCount; i++){
-                                currentJSONObject.put(metadata.getColumnLabel(i), resultset.getInt(i));
+                                if (metadata.getColumnLabel(i).equals("badgeid")){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
+                                } else {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), resultset.getInt(i));
+                                }
+                            }
+                            rawEmployeeData.add(currentJSONObject);
+                        }
+                    } else {
+                        resultCount = pstSelect.getUpdateCount();
+                        if ( resultCount == -1 ) {
+                            break;
+                        }
+                    }
+                    /* Check for More Data */
+                    hasresults = pstSelect.getMoreResults();
+                }
+                for (int i = 0; i < rawEmployeeData.size(); i++) {
+                    JSONObject currentEmployee = (JSONObject)rawEmployeeData.get(i);
+                    this.shiftsBadgeData.put((String)currentEmployee.get("badgeid"), (int)currentEmployee.get("shiftid"));
+                }
+                
+                
+                /*Prepare Select Shift Query*/
+                JSONArray rawShiftsData = new JSONArray();
+                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute, id, description FROM shift";
+                pstSelect = conn.prepareStatement(query);
+                hasresults = pstSelect.execute();
+                /*Execute Selet Query*/
+                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
+                    if ( hasresults ) {
+                        /* Get ResultSet Metadata */
+                        resultset = pstSelect.getResultSet();
+                        metadata = resultset.getMetaData();
+                        columnCount = metadata.getColumnCount();
+                        /* Get Data; Print as Table Rows */
+                        while(resultset.next()) {
+                            JSONObject currentJSONObject = new JSONObject();
+                            for (int i = 1; i <= columnCount; i++){
+                                if (metadata.getColumnLabel(i).equals("description")){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
+                                } else {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), resultset.getInt(i));
+                                }
                             }
                             rawShiftsData.add(currentJSONObject);
                         }
@@ -163,7 +204,7 @@ public class TASDatabase {
                     LocalTime stop = LocalTime.of((int)currentShift.get("stophour"), (int)currentShift.get("stopminute"));
                     LocalTime lunchStart = LocalTime.of((int)currentShift.get("lunchstarthour"), (int)currentShift.get("lunchstartminute"));
                     LocalTime lunchStop = LocalTime.of((int)currentShift.get("lunchstophour"), (int)currentShift.get("lunchstopminute"));
-                    Shift returningShift = new Shift((int)currentShift.get("id"), start, stop, lunchStart, lunchStop);
+                    Shift returningShift = new Shift((int)currentShift.get("id"),(String)currentShift.get("description") , start, stop, lunchStart, lunchStop);
                     shiftsData.put((int)currentShift.get("id"), returningShift);
                 }
             }
@@ -204,13 +245,14 @@ public class TASDatabase {
     
     public Shift getShift(int shiftId) {
         
-        Shift returningShift = (Shift)shiftsData.get(shiftId);
+        Shift returningShift = (Shift)this.shiftsData.get(shiftId);
         return returningShift;
     }
     
     public Shift getShift(Badge testBadge) {
         
-        Shift returningNull = new Shift();
-        return returningNull;
+        int shiftId = (int)this.shiftsBadgeData.get((String)testBadge.getId());
+        Shift returningShift = (Shift)this.shiftsData.get(shiftId);
+        return returningShift;
     }
 }

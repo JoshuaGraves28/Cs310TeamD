@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tas_fa18;
 
 import java.sql.*;
@@ -211,8 +206,7 @@ public class TASDatabase {
                     JSONObject currentEmployee = (JSONObject)rawEmployeeData.get(i);
                     this.shiftsBadgeData.put((String)currentEmployee.get("badgeid"), (int)currentEmployee.get("shiftid"));
                 }
-                
-                
+
                 /*Prepare Select Shift Query*/
                 JSONArray rawShiftsData = new JSONArray();
                 query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute, id, description FROM shift";

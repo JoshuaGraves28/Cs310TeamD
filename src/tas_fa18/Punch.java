@@ -85,25 +85,13 @@ public class Punch {
     public void adjust(Shift s) {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(this.originalTimeStamp);
-        LocalTime thisTime = LocalTime.of(calendar.get(calendar.HOUR_OF_DAY), calendar.get(calendar.get(calendar.MINUTE)));
+
         switch (this.punchType) {
             case CLOCK_OUT:
-                if ((Duration.between(thisTime, s.getLunchStart()).toMinutes()) < (Duration.between(thisTime, s.getStop()).toMinutes())) {
-                    
-                } else {
 
-                }
                 break;
             case CLOCK_IN:
-                if ((Duration.between(thisTime, s.getLunchStart()).toMinutes()) < (Duration.between(thisTime, s.getStop()).toMinutes())) {
-                    if ((thisTime.get(ChronoField.MINUTE_OF_DAY) - s.getLunchStart().get(ChronoField.MINUTE_OF_DAY)) > s.get)
-                } else {
-                    
-                }
-                break;
-            case TIMED_OUT:
-                long timeToBeSubtracted = s.getStop().getLong(ChronoField.MILLI_OF_SECOND) - thisTime.getLong(ChronoField.MILLI_OF_SECOND);
-                this.originalTimeStamp = this.originalTimeStamp - timeToBeSubtracted;
+
                 break;
             default:
                 break;

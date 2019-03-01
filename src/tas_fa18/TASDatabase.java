@@ -215,7 +215,7 @@ public class TASDatabase {
                 
                 /*Prepare Select Shift Query*/
                 JSONArray rawShiftsData = new JSONArray();
-                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute, id, description FROM shift";
+                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute, id, description, interval, graceperiod, dock FROM shift";
                 pstSelect = conn.prepareStatement(query);
                 hasresults = pstSelect.execute();
                 /*Execute Selet Query*/
@@ -252,7 +252,7 @@ public class TASDatabase {
                     LocalTime stop = LocalTime.of((int)currentShift.get("stophour"), (int)currentShift.get("stopminute"));
                     LocalTime lunchStart = LocalTime.of((int)currentShift.get("lunchstarthour"), (int)currentShift.get("lunchstartminute"));
                     LocalTime lunchStop = LocalTime.of((int)currentShift.get("lunchstophour"), (int)currentShift.get("lunchstopminute"));
-                    Shift returningShift = new Shift((int)currentShift.get("id"),(String)currentShift.get("description") , start, stop, lunchStart, lunchStop);
+                    Shift returningShift = new Shift((int)currentShift.get("id"),(String)currentShift.get("description") , start, stop, lunchStart, lunchStop, (int)currentShift.get("interval"), (int)currentShift.get("graceperiods"), (int)currentShift.get("dock"));
                     shiftsData.put((int)currentShift.get("id"), returningShift);
                 }
             }

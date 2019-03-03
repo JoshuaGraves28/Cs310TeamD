@@ -246,8 +246,8 @@ public class TASDatabase {
                     LocalTime stop = LocalTime.of((int)currentShift.get("stophour"), (int)currentShift.get("stopminute"));
                     LocalTime lunchStart = LocalTime.of((int)currentShift.get("lunchstarthour"), (int)currentShift.get("lunchstartminute"));
                     LocalTime lunchStop = LocalTime.of((int)currentShift.get("lunchstophour"), (int)currentShift.get("lunchstopminute"));
-                    Shift returningShift = new Shift((int)currentShift.get("id"),(String)currentShift.get("description") , start, stop, lunchStart, lunchStop, (int)currentShift.get("interval"), (int)currentShift.get("graceperiods"), (int)currentShift.get("dock"));
-                    shiftsData.put((int)currentShift.get("id"), returningShift);
+                    Shift returningShift = new Shift((int)currentShift.get("id"),(String)currentShift.get("description") , start, stop, lunchStart, lunchStop, (int)currentShift.get("interval"), (int)currentShift.get("graceperiod"), (int)currentShift.get("dock"));
+                    shiftsData.put((int)currentShift.get("id"), (Shift)returningShift);
                 }
             }
 
@@ -287,8 +287,8 @@ public class TASDatabase {
     
     public Shift getShift(int shiftId) {
         
-        Shift returningShift = (Shift)this.shiftsData.get(shiftId);
-        return returningShift;
+        Shift returning = (Shift)this.shiftsData.get(shiftId);
+        return returning;
     }
     
     public Shift getShift(Badge testBadge) {

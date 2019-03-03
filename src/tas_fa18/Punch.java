@@ -2,7 +2,6 @@ package tas_fa18;
 
 import java.text.*;
 import java.time.*;
-import java.time.temporal.ChronoField;
 import java.util.*;
 
 /**
@@ -83,12 +82,17 @@ public class Punch {
     }
 
     public void adjust(Shift s) {
-        GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(this.originalTimeStamp);
+        GregorianCalendar clockTime = new GregorianCalendar();
+        clockTime.setTimeInMillis(this.originalTimeStamp);
 
         switch (this.punchType) {
+            
             case CLOCK_OUT:
-
+                if (clockTime.get(Calendar.HOUR_OF_DAY) < ) {
+                    
+                } else {
+                    
+                }
                 break;
             case CLOCK_IN:
 
@@ -120,7 +124,7 @@ public class Punch {
                 System.out.println("Error");
         }
 
-        String originalTimestampString = "#" + this.employeeBadge.getId() + punchResults + " " + strDate.toUpperCase();
-        return originalTimestampString;
+        String adjustedTimestampString = "#" + this.employeeBadge.getId() + punchResults + " " + strDate.toUpperCase();
+        return adjustedTimestampString;
     }
 }

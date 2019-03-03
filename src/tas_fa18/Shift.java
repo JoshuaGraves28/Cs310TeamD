@@ -1,6 +1,7 @@
 package tas_fa18;
 
 import java.time.*;
+import java.time.temporal.ChronoField;
 /*
  * @author jdewi
  */
@@ -31,7 +32,7 @@ public class Shift {
     public LocalTime getStart(){
         return this.start;
     }
-
+    
     public LocalTime getStop() {
         return this.stop;
     }
@@ -50,6 +51,10 @@ public class Shift {
     
     public int getGracePeriod() {
         return this.gracePeriod;
+    }
+    
+    public int getDock() {
+        return this.dock;
     }
     
     @Override 

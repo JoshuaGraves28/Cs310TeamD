@@ -105,14 +105,10 @@ public class Punch {
         
         LocalTime lunchStart = s.getLunchStart();
         LocalTime lunchStop = s.getLunchStop();
-        System.out.println(lunchStart.getHour() + ":" + lunchStart.getMinute());
-        System.out.println(lunchStop.getHour() + ":" + lunchStop.getMinute());
+
         LocalTime betweenLunchTime = lunchStart.plusMinutes((Duration.between(lunchStart, lunchStop).toMinutes())/2);
         
-        System.out.println(betweenLunchTime.getHour() + ":" + betweenLunchTime.getMinute());
-        
         int dayItIs = clockTime.get(Calendar.DAY_OF_WEEK);
-        System.out.println(dayItIs);
 
         if (dayItIs != 1 && dayItIs != 7) {
             if ((thisTimeLocalTime.equals(startIntervalTime) || thisTimeLocalTime.isAfter(startIntervalTime)) && thisTimeLocalTime.isBefore(start)) {
@@ -199,112 +195,6 @@ public class Punch {
             clockTime.set(Calendar.SECOND, 00);
             this.typeOfAdjustment = "(None)";
         }
-        
-        /*
-        if (dayItIs != 1 && dayItIs != 7) {
-            
-            if (thisTimeLocalTime.isAfter(startIntervalTime) && thisTimeLocalTime.isBefore(start)) {
-                System.out.print(clockTime.getTime());
-                clockTime.set(Calendar.HOUR_OF_DAY, start.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, start.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, start.get(ChronoField.SECOND_OF_MINUTE));
-                System.out.println(" Time adjusted to: " + clockTime.getTime() + " Because interval to start");
-                this.typeOfAdjustment = "(Shift Start)";
-            } else if (thisTimeLocalTime.isAfter(start) && thisTimeLocalTime.isBefore(startGraceTime)) {
-                System.out.print(clockTime.getTime());
-                clockTime.set(Calendar.HOUR_OF_DAY, start.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, start.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, start.get(ChronoField.SECOND_OF_MINUTE));
-                System.out.println(" Time adjusted to: " + clockTime.getTime() + " Because grace to start");
-                this.typeOfAdjustment = "(Shift Start)";
-            } else if (thisTimeLocalTime.equals(start)){
-                clockTime.set(Calendar.HOUR_OF_DAY, start.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, start.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, start.get(ChronoField.SECOND_OF_MINUTE));
-                this.typeOfAdjustment = "(None)";
-            } else if (thisTimeLocalTime.isAfter(startGraceTime) && thisTimeLocalTime.isBefore(startDockTime)){
-                clockTime.set(Calendar.HOUR_OF_DAY, startDockTime.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, startDockTime.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, startDockTime.get(ChronoField.SECOND_OF_MINUTE));
-            } else if (thisTimeLocalTime.isAfter(stopDockTime) && thisTimeLocalTime.isBefore(stopGraceTime)) {
-                clockTime.set(Calendar.HOUR_OF_DAY, stopDockTime.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, stopDockTime.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, stopDockTime.get(ChronoField.SECOND_OF_MINUTE));
-            } else if (thisTimeLocalTime.isAfter(stopGraceTime) && thisTimeLocalTime.isBefore(stop)) {
-                clockTime.set(Calendar.HOUR_OF_DAY, stop.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, stop.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, stop.get(ChronoField.SECOND_OF_MINUTE));
-                this.typeOfAdjustment = "(None)";
-            } else if (thisTimeLocalTime.isAfter(stop) && thisTimeLocalTime.isBefore(stopIntervalTime)){
-                clockTime.set(Calendar.HOUR_OF_DAY, stop.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, stop.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, stop.get(ChronoField.SECOND_OF_MINUTE));
-                this.typeOfAdjustment = "(Shift Stop)";
-            } else if (thisTimeLocalTime.isAfter(lunchStart) && thisTimeLocalTime.isBefore(betweenLunchTime)) {
-                clockTime.set(Calendar.HOUR_OF_DAY, lunchStart.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, lunchStart.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, lunchStart.get(ChronoField.SECOND_OF_MINUTE));
-            } else if (thisTimeLocalTime.isAfter(betweenLunchTime) && thisTimeLocalTime.isBefore(lunchStop)) {
-                clockTime.set(Calendar.HOUR_OF_DAY, lunchStop.get(ChronoField.HOUR_OF_DAY));
-                clockTime.set(Calendar.MINUTE, lunchStop.get(ChronoField.MINUTE_OF_HOUR));
-                clockTime.set(Calendar.SECOND, lunchStop.get(ChronoField.SECOND_OF_MINUTE));
-            } else {
-                
-            }
-            
-        } else {
-            
-        }
-        
-        switch (this.punchType) {
-            
-            case CLOCK_OUT:
-                testClock1 = s.getLunchStart();
-                testClock2 = s.getStop();
-                
-                distance1 = Math.abs(Duration.between(testClock1, thisTimeLocalTime).toMinutes());
-                distance2 = Math.abs(Duration.between(testClock2, thisTimeLocalTime).toMinutes());
-                
-                if (distance1 < distance2) {
-                    System.out.println(distance1);
-                    clockTime.set(Calendar.HOUR_OF_DAY, testClock1.get(ChronoField.HOUR_OF_DAY));
-                    clockTime.set(Calendar.MINUTE, testClock1.get(ChronoField.MINUTE_OF_HOUR));
-                    clockTime.set(Calendar.SECOND, testClock1.get(ChronoField.SECOND_OF_MINUTE));
-                    this.typeOfAdjustment = "(Interval Round1)";
-                } else {
-                    System.out.println(distance2);
-                    clockTime.set(Calendar.HOUR_OF_DAY, testClock2.get(ChronoField.HOUR_OF_DAY));
-                    clockTime.set(Calendar.MINUTE, testClock2.get(ChronoField.MINUTE_OF_HOUR));
-                    clockTime.set(Calendar.SECOND, testClock2.get(ChronoField.SECOND_OF_MINUTE));
-                    this.typeOfAdjustment = "(Shift Start2)";
-                }
-                break;
-            case CLOCK_IN:
-                testClock1 = s.getLunchStop();
-                testClock2 = s.getStart();
-                
-                distance1 = Math.abs(Duration.between(testClock1, thisTimeLocalTime).toMinutes());
-                distance2 = Math.abs(Duration.between(testClock2, thisTimeLocalTime).toMinutes());
-                
-                if (distance1 < distance2) {
-                    System.out.println(distance1);
-                    clockTime.set(Calendar.HOUR_OF_DAY, testClock1.get(ChronoField.HOUR_OF_DAY));
-                    clockTime.set(Calendar.MINUTE, testClock1.get(ChronoField.MINUTE_OF_HOUR));
-                    clockTime.set(Calendar.SECOND, testClock1.get(ChronoField.SECOND_OF_MINUTE));
-                    this.typeOfAdjustment = "(Interval Round3)";
-                } else {
-                    System.out.println(distance2);
-                    clockTime.set(Calendar.HOUR_OF_DAY, testClock2.get(ChronoField.HOUR_OF_DAY));
-                    clockTime.set(Calendar.MINUTE, testClock2.get(ChronoField.MINUTE_OF_HOUR));
-                    clockTime.set(Calendar.SECOND, testClock2.get(ChronoField.SECOND_OF_MINUTE));
-                    this.typeOfAdjustment = "(Shift Start4)";
-                }
-                break;
-            default:
-                System.out.println("ERROR");
-                break;
-        }
-        */
         
         this.adjustedTimeStamp = clockTime.getTimeInMillis();
         

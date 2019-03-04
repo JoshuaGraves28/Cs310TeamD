@@ -19,7 +19,7 @@ public class Punch {
     private int punchType;
     private int terminalId;
     private long originalTimeStamp;
-    private long adjustedTimeStamp;
+    private long adjustedTimeStamp = 0;
     private String typeOfAdjustment = "";
 
     public Punch(Badge employeeBadges, int terminalId, int punchType, long originalTimeStamp) {
@@ -58,6 +58,11 @@ public class Punch {
         return returningLong;
     }
 
+    public long getAdjustedtimestamp() {
+        long returningLong = this.adjustedTimeStamp;
+        return returningLong;
+    }
+    
     public String printOriginalTimestamp() {
         String punchResults = "";
         GregorianCalendar calendar = new GregorianCalendar();

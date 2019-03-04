@@ -16,8 +16,9 @@ public class Shift {
     private int interval;
     private int gracePeriod;
     private int dock;
+    private int lunchDeduct;
     
-    public Shift(int shiftId, String shiftType, LocalTime start, LocalTime stop, LocalTime lunchStart, LocalTime lunchStop, int interval, int gracePeriod, int dock){
+    public Shift(int shiftId, String shiftType, LocalTime start, LocalTime stop, LocalTime lunchStart, LocalTime lunchStop, int interval, int gracePeriod, int dock, int lunchDeduct){
         this.shiftId = shiftId;
         this.shiftType = shiftType;
         this.start = start;
@@ -27,6 +28,7 @@ public class Shift {
         this.interval = interval;
         this.gracePeriod = gracePeriod;
         this.dock = dock;
+        this.lunchDeduct = lunchDeduct;
     }
     
     public LocalTime getStart(){
@@ -55,6 +57,10 @@ public class Shift {
     
     public int getDock() {
         return this.dock;
+    }
+    
+    public int getLunchDeduct() {
+        return this.lunchDeduct;
     }
     
     @Override 

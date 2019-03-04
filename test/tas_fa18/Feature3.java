@@ -14,7 +14,9 @@ public class Feature3 {
     
     @Test
     public void testAdjustPunchesShift1Weekday() {
-		
+
+        System.out.println("Running test testAdjustPunchesShift1Weekday");
+        
         /* Get Shift Ruleset and Punch Data */
         
         Shift s1 = db.getShift(1);
@@ -49,7 +51,9 @@ public class Feature3 {
 
     @Test
     public void testAdjustPunchesShift1Weekend() {
-		
+	
+        System.out.println("Running test testAdjustPunchesShift1Weekend");
+        
         /* Get Shift Ruleset and Punch Data */
         
         Shift s1 = db.getShift(1);
@@ -74,7 +78,9 @@ public class Feature3 {
     
     @Test
     public void testAdjustPunchesShift2Weekday() {
-		
+        
+        System.out.println("Running test testAdjustPunchesShift2Weekday");
+        
         /* Get Shift Ruleset and Punch Data */
         
         Shift s2 = db.getShift(2);
@@ -99,7 +105,9 @@ public class Feature3 {
     
     @Test
     public void testAdjustPunchesShift2Weekend() {
-		
+	
+        System.out.println("Running test testAdjustPunchesShift2Weekend");
+        
         /* Get Shift Ruleset and Punch Data */
         
         Shift s2 = db.getShift(2);
@@ -124,7 +132,9 @@ public class Feature3 {
     
     @Test
     public void testAdjustPunchesShift1SpecialCases() {
-		
+
+        System.out.println("Running test testAdjustPunchesShift1SpecialCases");
+        
         /* Get Shift Ruleset and Punch Data */
         
         Shift s1 = db.getShift(1);

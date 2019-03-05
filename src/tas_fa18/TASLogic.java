@@ -101,7 +101,6 @@ public class TASLogic {
             
             switch (currentPunchCalendar.get(Calendar.DAY_OF_WEEK)) {
                 case 1:
-                    System.out.println("Adding to sunday: " + p.printAdjustedTimestamp());
                     day1.add(p);
                     break;
                 case 2:
@@ -120,7 +119,6 @@ public class TASLogic {
                     day6.add(p);
                     break;
                 case 7:
-                    System.out.println("Adding to saturday: " + p.printAdjustedTimestamp());
                     day7.add(p);
                     break;
             }    
@@ -139,7 +137,9 @@ public class TASLogic {
             long minutesBetweenMillis = dateOfClockOut.getTime() - dateOfClockIn.getTime();
 
             long minutesBetweenLong = minutesBetweenMillis / (60 * 1000);
-
+            
+            System.out.println(minutesBetweenLong);
+            
             System.out.println(Math.toIntExact(minutesBetweenLong));
             
             minutesActuallyWorked += Math.toIntExact(minutesBetweenLong); 
@@ -174,6 +174,9 @@ public class TASLogic {
         double minutesActuallyWorkedDouble = new Double(minutesActuallyWorked);
         
         double absenteeismPercentage = 100 - ((minutesActuallyWorkedDouble/minutesScheduledInAWeekDouble) * 100);
+        
+        double test = 100 - ((2880/minutesScheduledInAWeekDouble) * 100);
+        
         System.out.println(absenteeismPercentage);
         
         return absenteeismPercentage;

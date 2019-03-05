@@ -1,6 +1,6 @@
 package tas_fa18;
 
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
 
 /*
@@ -69,7 +69,10 @@ public class Absenteeism {
         SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
         String startingPayPeriod = formatter.format(dateOfPunch);
         
-        stringToBeReturned = "#" + getBadgeId() + " (Pay Period Starting " + startingPayPeriod + "): " + absenteeismPercentage + "%";
+        NumberFormat formatterDec = new DecimalFormat("#0.00");
+        String doubleFormatted = formatterDec.format(absenteeismPercentage);
+        
+        stringToBeReturned = "#" + getBadgeId() + " (Pay Period Starting " + startingPayPeriod + "): " + doubleFormatted + "%";
         
         return stringToBeReturned;
     }

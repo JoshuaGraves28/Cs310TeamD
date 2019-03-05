@@ -56,8 +56,6 @@ public class Feature6 {
     @Test
     public void testAbsenteeismShift1Weekend() {
 	
-        System.out.println("testAbsenteeismShift1Weekend");
-        
         /* Get Punch */
         
         Punch p = db.getPunch(1087);
@@ -97,8 +95,6 @@ public class Feature6 {
     @Test
     public void testAbsenteeismShift2Weekend() {
 	
-        System.out.println("testAbsenteeismShift2Weekend");
-        
         /* Get Punch */
         
         Punch p = db.getPunch(4943);

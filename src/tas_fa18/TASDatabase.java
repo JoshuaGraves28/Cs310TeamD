@@ -344,18 +344,18 @@ public class TASDatabase {
         ArrayList<ArrayList<Punch>> returnedDays = new ArrayList();
         GregorianCalendar calendarToCheckWith = new GregorianCalendar();
         calendarToCheckWith.setTimeInMillis(timestamp);
+        int daysToIncreaseCalendar;
         
         int dayOfWeek = calendarToCheckWith.get(Calendar.DAY_OF_WEEK);
-        int daysToIncreaseCalendar = 0;
-        
-        while (dayOfWeek <= 7){
-            dayOfWeek++;
-            daysToIncreaseCalendar++;
+        if (dayOfWeek != DAYS_IN_A_WEEK){
+            daysToIncreaseCalendar = DAYS_IN_A_WEEK - dayOfWeek;
+        } else {
+            daysToIncreaseCalendar = 0;
         }
         
         calendarToCheckWith.add(Calendar.DAY_OF_MONTH, daysToIncreaseCalendar);
         
-        for (int i = 1; i < DAYS_IN_A_WEEK; i++){
+        for (int i = 0; i < DAYS_IN_A_WEEK; i++) {
             ArrayList<Punch> returnedDay = getDailyPunchList(badge, calendarToCheckWith.getTimeInMillis());
             returnedDays.add(returnedDay);
             

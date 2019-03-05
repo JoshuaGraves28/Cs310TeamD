@@ -138,11 +138,13 @@ public class TASLogic {
 
             long minutesBetweenLong = minutesBetweenMillis / (60 * 1000);
             
-            System.out.println(minutesBetweenLong);
+            int finalMinutes = Math.toIntExact(minutesBetweenLong);
             
-            System.out.println(Math.toIntExact(minutesBetweenLong));
+            if (finalMinutes > shift.getLunchDeduct()){
+                finalMinutes -= Math.toIntExact(Duration.between(shift.getLunchStart(), shift.getLunchStop()).toMinutes());
+            }
             
-            minutesActuallyWorked += Math.toIntExact(minutesBetweenLong); 
+            minutesActuallyWorked += finalMinutes; 
         }
         if (!day2.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day2, shift); }
         if (!day3.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day3, shift); }
@@ -163,21 +165,19 @@ public class TASLogic {
 
             long minutesBetweenLong = minutesBetweenMillis / (60 * 1000);
             
-            System.out.println(Math.toIntExact(minutesBetweenLong));
+            int finalMinutes = Math.toIntExact(minutesBetweenLong);
             
-            minutesActuallyWorked += Math.toIntExact(minutesBetweenLong); 
+            if (finalMinutes > shift.getLunchDeduct()){
+                finalMinutes -= Math.toIntExact(Duration.between(shift.getLunchStart(), shift.getLunchStop()).toMinutes());
+            }
+            
+            minutesActuallyWorked += finalMinutes; 
         }
-        
-        System.out.println("minutes scheduled: " + minutesScheduledInAWeek + " minutes worked: " + minutesActuallyWorked);
         
         double minutesScheduledInAWeekDouble = new Double(minutesScheduledInAWeek);
         double minutesActuallyWorkedDouble = new Double(minutesActuallyWorked);
         
         double absenteeismPercentage = 100 - ((minutesActuallyWorkedDouble/minutesScheduledInAWeekDouble) * 100);
-        
-        double test = 100 - ((2880/minutesScheduledInAWeekDouble) * 100);
-        
-        System.out.println(absenteeismPercentage);
         
         return absenteeismPercentage;
     }   

@@ -36,10 +36,11 @@ public class Feature6 {
         /* Compute Pay Period Total Absenteeism */
         
         double percentage = TASLogic.calculateAbsenteeism(punchlist, s);
-        
+
         /* Insert Absenteeism Into Database */
         
         Absenteeism a1 = new Absenteeism(b.getId(), ts, percentage);
+
         db.insertAbsenteeism(a1);
         
         /* Retrieve Absenteeism From Database */

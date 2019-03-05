@@ -8,7 +8,7 @@ import java.util.*;
  */
 
 public class Absenteeism {
-    private String badgeId = "";
+    private String badgeId;
     private long payPeriodTimestamp;
     private double absenteeismPercentage; 
     
@@ -17,9 +17,9 @@ public class Absenteeism {
         this.payPeriodTimestamp = determineUpcomingSunday(originalTimestamp);
         this.absenteeismPercentage = percentage;
     }
-    
-    public Absenteeism() {
-        
+
+    public void setAbsenteeismPercentage(double absenteeismPercentage) {
+        this.absenteeismPercentage = absenteeismPercentage;
     }
     
     public String getBadgeId() {
@@ -58,7 +58,7 @@ public class Absenteeism {
     
     @Override
     public String toString(){
-        String stringToBeReturned = "#";
+        String stringToBeReturned;
         GregorianCalendar calendarOfPunch = new GregorianCalendar();
         calendarOfPunch.setTimeInMillis(payPeriodTimestamp);
         
@@ -69,7 +69,7 @@ public class Absenteeism {
         SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
         String startingPayPeriod = formatter.format(dateOfPunch);
         
-        stringToBeReturned = stringToBeReturned + getBadgeId() + " (Pay Period Starting " + startingPayPeriod + "): " + absenteeismPercentage + "%";
+        stringToBeReturned = "#" + getBadgeId() + " (Pay Period Starting " + startingPayPeriod + "): " + absenteeismPercentage + "%";
         
         return stringToBeReturned;
     }

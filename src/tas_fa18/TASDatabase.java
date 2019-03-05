@@ -345,9 +345,6 @@ public class TASDatabase {
         GregorianCalendar calendarToCheckWith = new GregorianCalendar();
         calendarToCheckWith.setTimeInMillis(timestamp);
         
-        GregorianCalendar forwardADay = calendarToCheckWith;
-        GregorianCalendar previousSunday = calendarToCheckWith;
-        
         int dayOfWeek = calendarToCheckWith.get(Calendar.DAY_OF_WEEK);
         int daysToIncreaseCalendar = 0;
         
@@ -375,76 +372,29 @@ public class TASDatabase {
     }
     
     public Absenteeism getAbsenteeism(String badgeId, long originalTimestamp) {
+        Absenteeism foundAbsenteeism;
+        
         if (absenteeismData.containsKey(badgeId)) {
-            Absenteeism foundAbsenteeism = (Absenteeism)absenteeismData.get(badgeId);
-            return foundAbsenteeism;
+            foundAbsenteeism = (Absenteeism)absenteeismData.get(badgeId);
         } else {
-            
+            ArrayList<Punch> payPeriodOffTimeStamp = getPayPeriodPunchList(getBadge(badgeId), originalTimestamp);
+            double thisAbsenteeism = TASLogic.calculateAbsenteeism(payPeriodOffTimeStamp, getShift(getBadge(badgeId)));
+            foundAbsenteeism = new Absenteeism(badgeId, originalTimestamp, thisAbsenteeism);
+            insertAbsenteeism(foundAbsenteeism);
         }
-        Absenteeism temp = new Absenteeism();
-        return temp;
+        
+        return foundAbsenteeism;
     }
     
     public void insertAbsenteeism(Absenteeism absenteeismToBeInserted) {
         if (!absenteeismData.containsKey(absenteeismToBeInserted.getBadgeId())) {
-            Connection conn = null;
-            PreparedStatement pstUpdate = null;
-            ResultSet resultset = null;
-
-
-            String query;
-
-            int updateCount = 0;
-
-            try {
-
-                String server = ("jdbc:mysql://localhost/tas");
-                String username = "tasuser";
-                String password = "CSTEAMD";
-                System.out.println("Connecting to " + server + "...");
-
-
-                /* Load the MySQL JDBC Driver */
-
-                Class.forName("com.mysql.jdbc.Driver").newInstance();
-
-                /* Open Connection */
-
-                conn = DriverManager.getConnection(server, username, password);
-
-
-                if (conn.isValid(0)) {
-                    // Prepare Update Query
-
-                    query = "INSERT INTO people (badgeid, long, percentage) VALUES (?, ?, ?)";
-                    pstUpdate = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-                    pstUpdate.setString(1, absenteeismToBeInserted.getBadgeId());
-                    pstUpdate.setLong(2, absenteeismToBeInserted.getPayPeriodTimestamp());
-                    pstUpdate.setDouble(3, absenteeismToBeInserted.getAbsenteeismPercentage());
-
-                    // Execute Update Query
-
-                    updateCount = pstUpdate.executeUpdate();
-
-                    // Get New Key; Print To Console
-
-                    if (updateCount > 0) {
-
-                        resultset = pstUpdate.getGeneratedKeys();
-
-                        if (resultset.next()) {
-
-                            System.out.print("Update Successful!  New Key: ");
-                            System.out.println(resultset.getInt(1));
-
-                        }
-
-                    }
-                }
-            }
-            catch (Exception e) {
-                System.err.println(e.toString());
-            }
+            absenteeismData.put(absenteeismToBeInserted.getBadgeId(), absenteeismToBeInserted);
+        } else {
+            Absenteeism absenteeismToBeChanged = (Absenteeism)absenteeismData.get(absenteeismToBeInserted.getBadgeId());
+            absenteeismData.remove(absenteeismToBeInserted.getBadgeId());
+            
+            absenteeismToBeChanged.setAbsenteeismPercentage(absenteeismToBeInserted.getAbsenteeismPercentage());
+            absenteeismData.put(absenteeismToBeChanged.getBadgeId(), absenteeismToBeChanged);
         }
     }
 }

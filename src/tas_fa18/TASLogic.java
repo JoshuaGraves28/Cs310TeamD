@@ -89,8 +89,10 @@ public class TASLogic {
         ArrayList<Punch> day6 = new ArrayList();
         ArrayList<Punch> day7 = new ArrayList();
         
-        long timeSupposedToWorkInAWeekLong = ((Duration.between(shift.getStart(), shift.getLunchStart()).toMinutes() + (Duration.between(shift.getStop(), shift.getLunchStop()).toMinutes())) * 5);
-        int minutesScheduledInAWeek = (int)timeSupposedToWorkInAWeekLong;
+        long timeBetweenStartAndLunch = Duration.between(shift.getStart(), shift.getLunchStart()).toMinutes();
+        long timeBetweenLunchAndStop = Duration.between(shift.getLunchStop(), shift.getStop()).toMinutes();
+        long timeSupposedToWorkInAWeekLong = (timeBetweenStartAndLunch + timeBetweenLunchAndStop);
+        int minutesScheduledInAWeek = (int)timeSupposedToWorkInAWeekLong * 5;
         int minutesActuallyWorked = 0;
         
         for (Punch p : punchlist) {
@@ -99,6 +101,7 @@ public class TASLogic {
             
             switch (currentPunchCalendar.get(Calendar.DAY_OF_WEEK)) {
                 case 1:
+                    System.out.println("Adding to sunday: " + p.printAdjustedTimestamp());
                     day1.add(p);
                     break;
                 case 2:
@@ -117,22 +120,61 @@ public class TASLogic {
                     day6.add(p);
                     break;
                 case 7:
+                    System.out.println("Adding to saturday: " + p.printAdjustedTimestamp());
                     day7.add(p);
                     break;
             }    
         }
         
-        if (!day1.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day1, shift); }
+        if (!day1.isEmpty()) { 
+            GregorianCalendar ofClockIn = new GregorianCalendar();
+            GregorianCalendar ofClockOut = new GregorianCalendar();
+
+            ofClockIn.setTimeInMillis(day1.get(0).getAdjustedtimestamp());
+            ofClockOut.setTimeInMillis(day1.get(1).getAdjustedtimestamp());
+
+            Date dateOfClockIn = ofClockIn.getTime();
+            Date dateOfClockOut = ofClockOut.getTime();
+
+            long minutesBetweenMillis = dateOfClockOut.getTime() - dateOfClockIn.getTime();
+
+            long minutesBetweenLong = minutesBetweenMillis / (60 * 1000);
+
+            System.out.println(Math.toIntExact(minutesBetweenLong));
+            
+            minutesActuallyWorked += Math.toIntExact(minutesBetweenLong); 
+        }
         if (!day2.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day2, shift); }
         if (!day3.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day3, shift); }
         if (!day4.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day4, shift); }
         if (!day5.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day5, shift); }
         if (!day6.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day6, shift); }
-        if (!day7.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day7, shift); }
+        if (!day7.isEmpty()) { 
+            GregorianCalendar ofClockIn = new GregorianCalendar();
+            GregorianCalendar ofClockOut = new GregorianCalendar();
+
+            ofClockIn.setTimeInMillis(day7.get(0).getAdjustedtimestamp());
+            ofClockOut.setTimeInMillis(day7.get(1).getAdjustedtimestamp());
+
+            Date dateOfClockIn = ofClockIn.getTime();
+            Date dateOfClockOut = ofClockOut.getTime();
+
+            long minutesBetweenMillis = dateOfClockOut.getTime() - dateOfClockIn.getTime();
+
+            long minutesBetweenLong = minutesBetweenMillis / (60 * 1000);
+            
+            System.out.println(Math.toIntExact(minutesBetweenLong));
+            
+            minutesActuallyWorked += Math.toIntExact(minutesBetweenLong); 
+        }
+        
+        System.out.println("minutes scheduled: " + minutesScheduledInAWeek + " minutes worked: " + minutesActuallyWorked);
         
         double minutesScheduledInAWeekDouble = new Double(minutesScheduledInAWeek);
         double minutesActuallyWorkedDouble = new Double(minutesActuallyWorked);
-        double absenteeismPercentage = 1 - (minutesActuallyWorkedDouble/minutesScheduledInAWeekDouble);
+        
+        double absenteeismPercentage = 100 - ((minutesActuallyWorkedDouble/minutesScheduledInAWeekDouble) * 100);
+        System.out.println(absenteeismPercentage);
         
         return absenteeismPercentage;
     }   

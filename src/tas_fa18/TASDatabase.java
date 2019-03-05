@@ -10,6 +10,7 @@ import java.util.*;
  * @author jdewi
  */
 public class TASDatabase {
+    JSONObject absenteeismData = new JSONObject();
     JSONObject badgesData = new JSONObject();
     JSONObject punchesData = new JSONObject();
     JSONObject punchTypeData = new JSONObject();
@@ -55,41 +56,6 @@ public class TASDatabase {
                 
                 /* Connection Open! */
                 System.out.println("Connected Successfully!");
-                
-                query = "SELECT * from absenteeism";
-                pstSelect = conn.prepareStatement(query);
-                hasresults = pstSelect.execute();
-                JSONArray rawPunchesData = new JSONArray();
-                /*Execute Selet Query*/
-                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
-                    if ( hasresults ) {
-                        /* Get ResultSet Metadata */
-                        resultset = pstSelect.getResultSet();
-                        metadata = resultset.getMetaData();
-                        columnCount = metadata.getColumnCount();
-                        /* Get Data; Print as Table Rows */
-                        while(resultset.next()) {
-                            JSONObject currentJSONObject = new JSONObject();
-                            for (int i = 1; i <= columnCount; i++){
-                                if (metadata.getColumnLabel(i).equals("badgeid")){
-                                    currentJSONObject.put(metadata.getColumnLabel(i), (String)(resultset.getString(i)));
-                                } else if (metadata.getColumnLabel(i).equals("payperiod")) {
-                                    currentJSONObject.put(metadata.getColumnLabel(i), (long)(resultset.getLong(i)));
-                                } else if (metadata.getColumnLabel(i).equals("percentage")) {
-                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getDouble(i)));
-                                }
-                            }
-                            rawPunchesData.add(currentJSONObject);
-                        }
-                    } else {
-                        resultCount = pstSelect.getUpdateCount();
-                        if ( resultCount == -1 ) {
-                            break;
-                        }
-                    }
-                    /* Check for More Data */
-                    hasresults = pstSelect.getMoreResults();
-                }
                 
                 query = "SELECT * FROM badge";
                 pstSelect = conn.prepareStatement(query);
@@ -248,6 +214,50 @@ public class TASDatabase {
                     Shift returningShift = new Shift((int)currentShift.get("id"),(String)currentShift.get("description") , start, stop, lunchStart, lunchStop, (int)currentShift.get("interval"), (int)currentShift.get("graceperiod"), (int)currentShift.get("dock"), (int)currentShift.get("lunchdeduct"));
                     shiftsData.put((int)currentShift.get("id"), (Shift)returningShift);
                 }
+                
+                query = "SELECT * from absenteeism";
+                pstSelect = conn.prepareStatement(query);
+                hasresults = pstSelect.execute();
+                JSONArray rawAbsenteeismData = new JSONArray();
+                /*Execute Selet Query*/
+                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
+                    if ( hasresults ) {
+                        /* Get ResultSet Metadata */
+                        resultset = pstSelect.getResultSet();
+                        metadata = resultset.getMetaData();
+                        columnCount = metadata.getColumnCount();
+                        /* Get Data; Print as Table Rows */
+                        while(resultset.next()) {
+                            JSONObject currentJSONObject = new JSONObject();
+                            for (int i = 1; i <= columnCount; i++){
+                                if (metadata.getColumnLabel(i).equals("badgeid")){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (String)(resultset.getString(i)));
+                                } else if (metadata.getColumnLabel(i).equals("payperiod")) {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (long)(resultset.getLong(i)));
+                                } else if (metadata.getColumnLabel(i).equals("percentage")) {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getDouble(i)));
+                                }
+                            }
+                            rawAbsenteeismData.add(currentJSONObject);
+                        }
+                    } else {
+                        resultCount = pstSelect.getUpdateCount();
+                        if ( resultCount == -1 ) {
+                            break;
+                        }
+                    }
+                    /* Check for More Data */
+                    hasresults = pstSelect.getMoreResults();
+                }
+                
+                for (int i = 0; i < rawAbsenteeismData.size(); i++) {
+                    JSONObject currentAbsenteeism = (JSONObject)rawAbsenteeismData.get(i);
+                    
+                    Absenteeism madeFromDatabase = new Absenteeism((String)currentAbsenteeism.get("badgeid"), (long)currentAbsenteeism.get("payperiod"), (double)currentAbsenteeism.get("percentage"));
+                    
+                    this.absenteeismData.put((String)currentAbsenteeism.get("badgeid"), (Absenteeism) madeFromDatabase);
+                }
+                
             }
 
             /* Close Database Connection */
@@ -352,7 +362,7 @@ public class TASDatabase {
             ArrayList<Punch> returnedDay = getDailyPunchList(badge, calendarToCheckWith.getTimeInMillis());
             returnedDays.add(returnedDay);
             
-            calendarToCheckWith.add(Calendar.DAY_OF_MONTH, -i);
+            calendarToCheckWith.add(Calendar.DAY_OF_MONTH, -1);
         }
 
         for (ArrayList<Punch> pList : returnedDays) {
@@ -365,11 +375,76 @@ public class TASDatabase {
     }
     
     public Absenteeism getAbsenteeism(String badgeId, long originalTimestamp) {
+        if (absenteeismData.containsKey(badgeId)) {
+            Absenteeism foundAbsenteeism = (Absenteeism)absenteeismData.get(badgeId);
+            return foundAbsenteeism;
+        } else {
+            
+        }
         Absenteeism temp = new Absenteeism();
         return temp;
     }
     
     public void insertAbsenteeism(Absenteeism absenteeismToBeInserted) {
-        
+        if (!absenteeismData.containsKey(absenteeismToBeInserted.getBadgeId())) {
+            Connection conn = null;
+            PreparedStatement pstUpdate = null;
+            ResultSet resultset = null;
+
+
+            String query;
+
+            int updateCount = 0;
+
+            try {
+
+                String server = ("jdbc:mysql://localhost/tas");
+                String username = "tasuser";
+                String password = "CSTEAMD";
+                System.out.println("Connecting to " + server + "...");
+
+
+                /* Load the MySQL JDBC Driver */
+
+                Class.forName("com.mysql.jdbc.Driver").newInstance();
+
+                /* Open Connection */
+
+                conn = DriverManager.getConnection(server, username, password);
+
+
+                if (conn.isValid(0)) {
+                    // Prepare Update Query
+
+                    query = "INSERT INTO people (badgeid, long, percentage) VALUES (?, ?, ?)";
+                    pstUpdate = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                    pstUpdate.setString(1, absenteeismToBeInserted.getBadgeId());
+                    pstUpdate.setLong(2, absenteeismToBeInserted.getPayPeriodTimestamp());
+                    pstUpdate.setDouble(3, absenteeismToBeInserted.getAbsenteeismPercentage());
+
+                    // Execute Update Query
+
+                    updateCount = pstUpdate.executeUpdate();
+
+                    // Get New Key; Print To Console
+
+                    if (updateCount > 0) {
+
+                        resultset = pstUpdate.getGeneratedKeys();
+
+                        if (resultset.next()) {
+
+                            System.out.print("Update Successful!  New Key: ");
+                            System.out.println(resultset.getInt(1));
+
+                        }
+
+                    }
+                }
+            }
+            catch (Exception e) {
+                System.err.println(e.toString());
+            }
+        }
     }
 }

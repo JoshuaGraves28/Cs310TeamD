@@ -81,9 +81,59 @@ public class TASLogic {
     
     public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift shift){
         
+        ArrayList<Punch> day1 = new ArrayList();
+        ArrayList<Punch> day2 = new ArrayList();
+        ArrayList<Punch> day3 = new ArrayList();
+        ArrayList<Punch> day4 = new ArrayList();
+        ArrayList<Punch> day5 = new ArrayList();
+        ArrayList<Punch> day6 = new ArrayList();
+        ArrayList<Punch> day7 = new ArrayList();
         
+        long timeSupposedToWorkInAWeekLong = ((Duration.between(shift.getStart(), shift.getLunchStart()).toMinutes() + (Duration.between(shift.getStop(), shift.getLunchStop()).toMinutes())) * 5);
+        int minutesScheduledInAWeek = (int)timeSupposedToWorkInAWeekLong;
+        int minutesActuallyWorked = 0;
         
-        double temp = 0;
-        return temp;
+        for (Punch p : punchlist) {
+            GregorianCalendar currentPunchCalendar = new GregorianCalendar();
+            currentPunchCalendar.setTimeInMillis(p.getAdjustedtimestamp());
+            
+            switch (currentPunchCalendar.get(Calendar.DAY_OF_WEEK)) {
+                case 1:
+                    day1.add(p);
+                    break;
+                case 2:
+                    day2.add(p);
+                    break;
+                case 3:
+                    day3.add(p);
+                    break;
+                case 4:
+                    day4.add(p);
+                    break;
+                case 5:
+                    day5.add(p);
+                    break;
+                case 6:
+                    day6.add(p);
+                    break;
+                case 7:
+                    day7.add(p);
+                    break;
+            }    
+        }
+        
+        if (!day1.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day1, shift); }
+        if (!day2.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day2, shift); }
+        if (!day3.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day3, shift); }
+        if (!day4.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day4, shift); }
+        if (!day5.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day5, shift); }
+        if (!day6.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day6, shift); }
+        if (!day7.isEmpty()) { minutesActuallyWorked += calculateTotalMinutes(day7, shift); }
+        
+        double minutesScheduledInAWeekDouble = new Double(minutesScheduledInAWeek);
+        double minutesActuallyWorkedDouble = new Double(minutesActuallyWorked);
+        double absenteeismPercentage = 1 - (minutesActuallyWorkedDouble/minutesScheduledInAWeekDouble);
+        
+        return absenteeismPercentage;
     }   
 }

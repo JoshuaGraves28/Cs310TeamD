@@ -55,9 +55,11 @@ public class TASDatabase {
                 /* Connection Open! */
                 System.out.println("Connected Successfully!");
                 
+                /*
                 query = "CREATE TABLE `absenteeism` (`badgeid` char(8) NOT NULL,`payperiod` timestamp NOT NULL,`percentage` double NOT NULL,PRIMARY KEY (`badgeid`,`payperiod`),CONSTRAINT `FK_absenteeism_1` FOREIGN KEY (`badgeid`) REFERENCES `badge` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
                 pstSelect = conn.prepareStatement(query);
                 pstSelect.execute();
+                */
                 
                 query = "SELECT * FROM badge";
                 pstSelect = conn.prepareStatement(query);

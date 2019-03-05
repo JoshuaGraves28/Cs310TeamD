@@ -15,6 +15,7 @@ public class TASDatabase {
     JSONObject punchTypeData = new JSONObject();
     JSONObject shiftsData = new JSONObject();
     JSONObject shiftsBadgeData = new JSONObject();
+    private int DAYS_IN_A_WEEK = 7;
     int lowestPunchId = 0;
     int greatestPunchId = 0;
     
@@ -55,11 +56,40 @@ public class TASDatabase {
                 /* Connection Open! */
                 System.out.println("Connected Successfully!");
                 
-                /*
-                query = "CREATE TABLE `absenteeism` (`badgeid` char(8) NOT NULL,`payperiod` timestamp NOT NULL,`percentage` double NOT NULL,PRIMARY KEY (`badgeid`,`payperiod`),CONSTRAINT `FK_absenteeism_1` FOREIGN KEY (`badgeid`) REFERENCES `badge` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+                query = "SELECT * from absenteeism";
                 pstSelect = conn.prepareStatement(query);
-                pstSelect.execute();
-                */
+                hasresults = pstSelect.execute();
+                JSONArray rawPunchesData = new JSONArray();
+                /*Execute Selet Query*/
+                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
+                    if ( hasresults ) {
+                        /* Get ResultSet Metadata */
+                        resultset = pstSelect.getResultSet();
+                        metadata = resultset.getMetaData();
+                        columnCount = metadata.getColumnCount();
+                        /* Get Data; Print as Table Rows */
+                        while(resultset.next()) {
+                            JSONObject currentJSONObject = new JSONObject();
+                            for (int i = 1; i <= columnCount; i++){
+                                if (metadata.getColumnLabel(i).equals("badgeid")){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (String)(resultset.getString(i)));
+                                } else if (metadata.getColumnLabel(i).equals("payperiod")) {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (long)(resultset.getLong(i)));
+                                } else if (metadata.getColumnLabel(i).equals("percentage")) {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getDouble(i)));
+                                }
+                            }
+                            rawPunchesData.add(currentJSONObject);
+                        }
+                    } else {
+                        resultCount = pstSelect.getUpdateCount();
+                        if ( resultCount == -1 ) {
+                            break;
+                        }
+                    }
+                    /* Check for More Data */
+                    hasresults = pstSelect.getMoreResults();
+                }
                 
                 query = "SELECT * FROM badge";
                 pstSelect = conn.prepareStatement(query);
@@ -280,6 +310,7 @@ public class TASDatabase {
         GregorianCalendar calendarToCheckWith = new GregorianCalendar();
         calendarToCheckWith.setTimeInMillis(ts);
         java.util.Date dateToCheckWith = calendarToCheckWith.getTime();
+        
         for (int i = 0; i < this.punchesData.size(); i++){
             if (this.punchesData.containsKey(this.lowestPunchId + i)){
                 Punch currentPunch = (Punch)this.punchesData.get(this.lowestPunchId + i);
@@ -294,6 +325,51 @@ public class TASDatabase {
                 }
             }
         }
+        
         return returningPunchList;
+    }
+    
+    public ArrayList getPayPeriodPunchList(Badge badge, long timestamp) {
+        ArrayList<Punch> finalPunchList = new ArrayList();
+        ArrayList<ArrayList<Punch>> returnedDays = new ArrayList();
+        GregorianCalendar calendarToCheckWith = new GregorianCalendar();
+        calendarToCheckWith.setTimeInMillis(timestamp);
+        
+        GregorianCalendar forwardADay = calendarToCheckWith;
+        GregorianCalendar previousSunday = calendarToCheckWith;
+        
+        int dayOfWeek = calendarToCheckWith.get(Calendar.DAY_OF_WEEK);
+        int daysToIncreaseCalendar = 0;
+        
+        while (dayOfWeek <= 7){
+            dayOfWeek++;
+            daysToIncreaseCalendar++;
+        }
+        
+        calendarToCheckWith.add(Calendar.DAY_OF_MONTH, daysToIncreaseCalendar);
+        
+        for (int i = 1; i < DAYS_IN_A_WEEK; i++){
+            ArrayList<Punch> returnedDay = getDailyPunchList(badge, calendarToCheckWith.getTimeInMillis());
+            returnedDays.add(returnedDay);
+            
+            calendarToCheckWith.add(Calendar.DAY_OF_MONTH, -i);
+        }
+
+        for (ArrayList<Punch> pList : returnedDays) {
+            for (Punch p : pList){
+                finalPunchList.add(p);
+            }
+        }
+
+        return finalPunchList;
+    }
+    
+    public Absenteeism getAbsenteeism(String badgeId, long originalTimestamp) {
+        Absenteeism temp = new Absenteeism();
+        return temp;
+    }
+    
+    public void insertAbsenteeism(Absenteeism absenteeismToBeInserted) {
+        
     }
 }

@@ -18,6 +18,7 @@ public class TASLogic {
         for (Punch p: dailyPunchList) {
             punchListPunchType.add(p.getPunchtypeid());
         }
+        
         if (punchListPunchType.size() > 1) {
             for (int i = 0; i < punchListPunchType.size(); i++){
                 if (i%2 == 0){
@@ -56,9 +57,8 @@ public class TASLogic {
     }
     
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
-        String returningJSONString = "";
-        /* Create ArrayList Object */
-        
+        String returningJSONString;
+
         ArrayList<HashMap<String, String>> jsonData = new ArrayList();
         
         for (Punch p : dailypunchlist) {
@@ -78,4 +78,12 @@ public class TASLogic {
         
         return returningJSONString;
     }
+    
+    public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift shift){
+        
+        
+        
+        double temp = 0;
+        return temp;
+    }   
 }

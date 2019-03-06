@@ -1,5 +1,10 @@
-package tas_fa18;
+package tas_sp19;
 
+import tas_sp19.Shift;
+import tas_sp19.Badge;
+import tas_sp19.TASDatabase;
+import tas_sp19.TASLogic;
+import tas_sp19.Punch;
 import java.util.ArrayList;
 import org.junit.*;
 import static org.junit.Assert.*;

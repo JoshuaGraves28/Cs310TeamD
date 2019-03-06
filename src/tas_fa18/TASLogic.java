@@ -1,5 +1,6 @@
 package tas_fa18;
 
+import java.text.*;
 import java.time.*;
 import java.util.*;
 import org.json.simple.*;
@@ -81,6 +82,21 @@ public class TASLogic {
     
     public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift shift){
         
+        long timeBetweenStartAndLunch = Duration.between(shift.getStart(), shift.getLunchStart()).toMinutes();
+        long timeBetweenLunchAndStop = Duration.between(shift.getLunchStop(), shift.getStop()).toMinutes();
+        long timeSupposedToWorkInAWeekLong = (timeBetweenStartAndLunch + timeBetweenLunchAndStop);
+        int minutesScheduledInAWeek = (int)timeSupposedToWorkInAWeekLong * 5;
+        
+        double minutesScheduledInAWeekDouble = new Double(minutesScheduledInAWeek);
+        double minutesActuallyWorkedDouble = new Double(calculateMinutesInPayPeriod(punchlist, shift));
+        
+        double absenteeismPercentage = 100 - ((minutesActuallyWorkedDouble/minutesScheduledInAWeekDouble) * 100);
+        
+        return absenteeismPercentage;
+    }
+    
+    public static int calculateMinutesInPayPeriod(ArrayList<Punch> punchlist, Shift shift) {
+        
         ArrayList<Punch> day1 = new ArrayList();
         ArrayList<Punch> day2 = new ArrayList();
         ArrayList<Punch> day3 = new ArrayList();
@@ -89,10 +105,6 @@ public class TASLogic {
         ArrayList<Punch> day6 = new ArrayList();
         ArrayList<Punch> day7 = new ArrayList();
         
-        long timeBetweenStartAndLunch = Duration.between(shift.getStart(), shift.getLunchStart()).toMinutes();
-        long timeBetweenLunchAndStop = Duration.between(shift.getLunchStop(), shift.getStop()).toMinutes();
-        long timeSupposedToWorkInAWeekLong = (timeBetweenStartAndLunch + timeBetweenLunchAndStop);
-        int minutesScheduledInAWeek = (int)timeSupposedToWorkInAWeekLong * 5;
         int minutesActuallyWorked = 0;
         
         for (Punch p : punchlist) {
@@ -174,11 +186,71 @@ public class TASLogic {
             minutesActuallyWorked += finalMinutes; 
         }
         
-        double minutesScheduledInAWeekDouble = new Double(minutesScheduledInAWeek);
-        double minutesActuallyWorkedDouble = new Double(minutesActuallyWorked);
+        return minutesActuallyWorked;
         
-        double absenteeismPercentage = 100 - ((minutesActuallyWorkedDouble/minutesScheduledInAWeekDouble) * 100);
+    }
+    
+    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s) {
+        String stringToReturn;
+        ArrayList<HashMap<String, String>> listToTransform = new ArrayList();
         
-        return absenteeismPercentage;
-    }   
+        ArrayList<Punch> punchListUnordered = new ArrayList(punchlist);
+        ArrayList<Punch> orderedPunches = new ArrayList();
+        
+        int smallestId = punchListUnordered.get(0).getPunchId();
+        
+        while (orderedPunches.size() != punchlist.size()) {
+            for (Punch p : punchListUnordered) {
+                if (p.getPunchId() < smallestId) {
+                    smallestId = p.getPunchId();
+                }
+            }
+
+            for (int i = 0; i < punchListUnordered.size() ; i++) {
+
+                if (i < punchListUnordered.size()){ 
+                    Punch p = punchListUnordered.get(i);
+                    if (p.getPunchId() == smallestId){
+                        orderedPunches.add(punchListUnordered.get(i));
+                        punchListUnordered.remove(i);
+                    }
+                }
+            }
+
+            if (!punchListUnordered.isEmpty()) {
+                smallestId = punchListUnordered.get(0).getPunchId();
+            }
+        }
+        
+        for (Punch p : orderedPunches) {
+            HashMap<String, String> punchInfo = new HashMap();
+            punchInfo.put("id", Integer.toString(p.getPunchId()));
+            punchInfo.put("badgeid", p.getBadgeid());
+            punchInfo.put("terminalid", Integer.toString(p.getTerminalid()));
+            punchInfo.put("punchtypeid", Integer.toString(p.getPunchtypeid()));
+            punchInfo.put("punchdata", p.getPunchData());
+            punchInfo.put("originaltimestamp", Long.toString(p.getOriginaltimestamp()));
+            punchInfo.put("adjustedtimestamp", Long.toString(p.getAdjustedtimestamp()));
+            
+            listToTransform.add(punchInfo);
+        }
+        
+        HashMap<String, String> payPeriodInfo = new HashMap();
+        
+        double absenteeism = calculateAbsenteeism(punchlist, s);
+        int totalMinutes = calculateMinutesInPayPeriod(punchlist, s);
+        
+        NumberFormat formatterDec = new DecimalFormat("#0.00");
+        String doubleFormatted = formatterDec.format(absenteeism);
+        
+        payPeriodInfo.put("absenteeism", doubleFormatted + "%");
+        payPeriodInfo.put("totalminutes", Integer.toString(totalMinutes));
+        
+        listToTransform.add(payPeriodInfo);
+        
+        stringToReturn = JSONValue.toJSONString(listToTransform);
+        
+        return stringToReturn;
+    }
+    
 }

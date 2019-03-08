@@ -1,4 +1,4 @@
-package tas_fa18;
+package tas_sp19;
 
 import java.sql.*;
 import java.text.*;
@@ -14,6 +14,7 @@ public class TASDatabase {
     JSONObject badgesData = new JSONObject();
     JSONObject punchesData = new JSONObject();
     JSONObject punchTypeData = new JSONObject();
+    JSONObject dailyScheduleData = new JSONObject();
     JSONObject shiftsData = new JSONObject();
     JSONObject shiftsBadgeData = new JSONObject();
     private int DAYS_IN_A_WEEK = 7;
@@ -173,8 +174,8 @@ public class TASDatabase {
                 }
 
                 /*Prepare Select Shift Query*/
-                JSONArray rawShiftsData = new JSONArray();
-                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute, id, description, `interval`, graceperiod, dock, lunchdeduct FROM shift";
+                JSONArray rawDailyScheduleData = new JSONArray();
+                query = "SELECT Hour(start) as starthour,Minute(start) as startminute, Hour(stop) as stophour, Minute(stop) as stopminute, Hour(lunchstart) as lunchstarthour, Minute(lunchstart) as lunchstartminute, Hour(lunchstop) as lunchstophour, Minute(lunchstop) as lunchstopminute, id, `interval`, graceperiod, dock, lunchdeduct FROM dailyschedule";
                 pstSelect = conn.prepareStatement(query);
                 hasresults = pstSelect.execute();
                 /*Execute Selet Query*/
@@ -188,13 +189,16 @@ public class TASDatabase {
                         while(resultset.next()) {
                             JSONObject currentJSONObject = new JSONObject();
                             for (int i = 1; i <= columnCount; i++){
-                                if (metadata.getColumnLabel(i).equals("description")){
-                                    currentJSONObject.put(metadata.getColumnLabel(i), resultset.getString(i));
-                                } else {
+                                /*
+                                if ((metadata.getColumnLabel(i).equals("id")) || (metadata.getColumnLabel(i).equals("interval")) || (metadata.getColumnLabel(i).equals("graceperiod")) || (metadata.getColumnLabel(i).equals("dock")) || (metadata.getColumnLabel(i).equals("lunchDeduct"))) {
                                     currentJSONObject.put(metadata.getColumnLabel(i), resultset.getInt(i));
+                                } else {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), resultset.getLong(i));
                                 }
+                                */
+                                currentJSONObject.put(metadata.getColumnLabel(i), resultset.getInt(i));
                             }
-                            rawShiftsData.add(currentJSONObject);
+                            rawDailyScheduleData.add(currentJSONObject);
                         }
                     } else {
                         resultCount = pstSelect.getUpdateCount();
@@ -205,14 +209,55 @@ public class TASDatabase {
                     /* Check for More Data */
                     hasresults = pstSelect.getMoreResults();
                 }
-                for (int i = 0; i < rawShiftsData.size(); i++){
-                    JSONObject currentShift = (JSONObject)rawShiftsData.get(i);
-                    LocalTime start = LocalTime.of((int)currentShift.get("starthour"), (int)currentShift.get("startminute"));
-                    LocalTime stop = LocalTime.of((int)currentShift.get("stophour"), (int)currentShift.get("stopminute"));
-                    LocalTime lunchStart = LocalTime.of((int)currentShift.get("lunchstarthour"), (int)currentShift.get("lunchstartminute"));
-                    LocalTime lunchStop = LocalTime.of((int)currentShift.get("lunchstophour"), (int)currentShift.get("lunchstopminute"));
-                    Shift returningShift = new Shift((int)currentShift.get("id"),(String)currentShift.get("description") , start, stop, lunchStart, lunchStop, (int)currentShift.get("interval"), (int)currentShift.get("graceperiod"), (int)currentShift.get("dock"), (int)currentShift.get("lunchdeduct"));
-                    shiftsData.put((int)currentShift.get("id"), (Shift)returningShift);
+                for (int i = 0; i < rawDailyScheduleData.size(); i++){
+                    JSONObject currentDailySchedule = (JSONObject)rawDailyScheduleData.get(i);
+                    LocalTime start = LocalTime.of((int)currentDailySchedule.get("starthour"), (int)currentDailySchedule.get("startminute"));
+                    LocalTime stop = LocalTime.of((int)currentDailySchedule.get("stophour"), (int)currentDailySchedule.get("stopminute"));
+                    LocalTime lunchStart = LocalTime.of((int)currentDailySchedule.get("lunchstarthour"), (int)currentDailySchedule.get("lunchstartminute"));
+                    LocalTime lunchStop = LocalTime.of((int)currentDailySchedule.get("lunchstophour"), (int)currentDailySchedule.get("lunchstopminute"));
+                    DailySchedule returningDailySchedule = new DailySchedule((int)currentDailySchedule.get("id"), start, stop, lunchStart, lunchStop, (int)currentDailySchedule.get("interval"), (int)currentDailySchedule.get("graceperiod"), (int)currentDailySchedule.get("dock"), (int)currentDailySchedule.get("lunchdeduct"));
+                    dailyScheduleData.put((int)currentDailySchedule.get("id"), (DailySchedule)returningDailySchedule);
+                }
+                
+                query = "SELECT * from shift";
+                pstSelect = conn.prepareStatement(query);
+                hasresults = pstSelect.execute();
+                JSONArray rawShiftData = new JSONArray();
+                /*Execute Selet Query*/
+                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
+                    if ( hasresults ) {
+                        /* Get ResultSet Metadata */
+                        resultset = pstSelect.getResultSet();
+                        metadata = resultset.getMetaData();
+                        columnCount = metadata.getColumnCount();
+                        /* Get Data; Print as Table Rows */
+                        while(resultset.next()) {
+                            JSONObject currentJSONObject = new JSONObject();
+                            for (int i = 1; i <= columnCount; i++){
+                                if (metadata.getColumnLabel(i).equals("description")){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (String)(resultset.getString(i)));
+                                } else {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getInt(i)));
+                                }
+                            }
+                            rawShiftData.add(currentJSONObject);
+                        }
+                    } else {
+                        resultCount = pstSelect.getUpdateCount();
+                        if ( resultCount == -1 ) {
+                            break;
+                        }
+                    }
+                    /* Check for More Data */
+                    hasresults = pstSelect.getMoreResults();
+                }
+                
+                for (int i = 0; i < rawShiftData.size(); i++) {
+                    JSONObject currentShift = (JSONObject)rawShiftData.get(i);
+                    
+                    Shift returningShift = new Shift((int)currentShift.get("id"), (String)currentShift.get("description"), (DailySchedule)dailyScheduleData.get((int)currentShift.get("dailyscheduleid")));
+                    
+                    this.shiftsData.put((int)currentShift.get("id"), (Shift) returningShift);
                 }
                 
                 query = "SELECT * from absenteeism";
@@ -297,6 +342,10 @@ public class TASDatabase {
     public Shift getShift(int shiftId) {
         
         Shift returning = (Shift)this.shiftsData.get(shiftId);
+        
+        System.out.println("test");
+        System.out.println(returning.toString());
+        System.out.println("found shift");
         return returning;
     }
     

@@ -1,5 +1,8 @@
 package tas_sp19;
 
+import tas_sp19.Badge;
+import tas_sp19.TASDatabase;
+import tas_sp19.Punch;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;

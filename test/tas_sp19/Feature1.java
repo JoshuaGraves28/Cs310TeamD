@@ -1,5 +1,9 @@
 package tas_sp19;
 
+import tas_sp19.Shift;
+import tas_sp19.TASDatabase;
+import tas_sp19.Punch;
+import tas_sp19.Badge;
 
 import org.junit.*;
 import static org.junit.Assert.*;

@@ -14,7 +14,7 @@ public class TASDatabase {
     JSONObject badgesData = new JSONObject();
     JSONObject punchesData = new JSONObject();
     JSONObject punchTypeData = new JSONObject();
-    JSONObject dailyScheduleData = new JSONObject();
+    HashMap<Integer, DailySchedule> dailyScheduleData = new HashMap();
     JSONObject shiftsData = new JSONObject();
     JSONObject shiftsBadgeData = new JSONObject();
     private int DAYS_IN_A_WEEK = 7;
@@ -255,7 +255,7 @@ public class TASDatabase {
                 for (int i = 0; i < rawShiftData.size(); i++) {
                     JSONObject currentShift = (JSONObject)rawShiftData.get(i);
                     
-                    Shift returningShift = new Shift((int)currentShift.get("id"), (String)currentShift.get("description"), (DailySchedule)dailyScheduleData.get((int)currentShift.get("dailyscheduleid")));
+                    Shift returningShift = new Shift((int)currentShift.get("id"), (String)currentShift.get("description"), (int)currentShift.get("dailyscheduleid"), (HashMap<Integer, DailySchedule>) dailyScheduleData);
                     
                     this.shiftsData.put((int)currentShift.get("id"), (Shift) returningShift);
                 }
@@ -342,10 +342,6 @@ public class TASDatabase {
     public Shift getShift(int shiftId) {
         
         Shift returning = (Shift)this.shiftsData.get(shiftId);
-        
-        System.out.println("test");
-        System.out.println(returning.toString());
-        System.out.println("found shift");
         return returning;
     }
     

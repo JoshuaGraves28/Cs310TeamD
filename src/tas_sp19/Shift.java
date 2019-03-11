@@ -1,22 +1,22 @@
 package tas_sp19;
 
 import java.time.*;
-import java.util.ArrayList;
+import java.util.*;
 /*
  * @author jdewi
  */
 public class Shift {
     
     private int shiftId;
+    private int dailyScheduleId;
     private String shiftType;
-    private DailySchedule shiftSchedule;
-    private ArrayList<DailySchedule> payPeriodWeekSchedule;
+    private HashMap<Integer, DailySchedule> possibleDailySchedule;
     
-    
-    public Shift(int shiftId, String shiftType, DailySchedule shiftSchedule){
+    public Shift(int shiftId, String shiftType, int dailyScheduleId, HashMap<Integer, DailySchedule> possibleDailySchedule){
         this.shiftId = shiftId;
         this.shiftType = shiftType;
-        this.shiftSchedule = shiftSchedule;
+        this.dailyScheduleId = dailyScheduleId;
+        this.possibleDailySchedule = possibleDailySchedule;
     }
     
     public Shift() {
@@ -24,35 +24,35 @@ public class Shift {
     }
     
     public LocalTime getStart(){
-        return this.shiftSchedule.getStart();
+        return this.possibleDailySchedule.get(this.dailyScheduleId).getStart();
     }
     
     public LocalTime getStop() {
-        return this.shiftSchedule.getStop();
+        return this.possibleDailySchedule.get(this.dailyScheduleId).getStop();
     }
 
     public LocalTime getLunchStart() {
-        return this.shiftSchedule.getLunchStart();
+        return this.possibleDailySchedule.get(this.dailyScheduleId).getLunchStart();
     }
 
     public LocalTime getLunchStop() {
-        return this.shiftSchedule.getLunchStop();
+        return this.possibleDailySchedule.get(this.dailyScheduleId).getLunchStop();
     }
     
     public int getInterval() {
-        return this.shiftSchedule.getInterval();
+        return this.possibleDailySchedule.get(this.dailyScheduleId).getInterval();
     }
     
     public int getGracePeriod() {
-        return this.shiftSchedule.getGracePeriod();
+        return this.possibleDailySchedule.get(this.dailyScheduleId).getGracePeriod();
     }
     
     public int getDock() {
-        return this.shiftSchedule.getDock();
+        return this.possibleDailySchedule.get(this.dailyScheduleId).getDock();
     }
     
     public int getLunchDeduct() {
-        return this.shiftSchedule.getLunchDeduct();
+        return this.possibleDailySchedule.get(this.dailyScheduleId).getLunchDeduct();
     }
     
     @Override 

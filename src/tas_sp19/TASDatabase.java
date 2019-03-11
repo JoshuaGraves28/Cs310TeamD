@@ -356,6 +356,12 @@ public class TASDatabase {
         return returningShift;
     }
     
+    public Shift getShift(Badge badge, long timestamp) {
+     
+        Shift nullShift = new Shift();
+        return nullShift;
+    }
+    
     public int insertPunch(Punch punchToBeInserted) {
         this.greatestPunchId++;
         punchToBeInserted.addPunchId(this.greatestPunchId);

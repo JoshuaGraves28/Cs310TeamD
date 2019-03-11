@@ -1,6 +1,7 @@
 package tas_sp19;
 
 import java.time.*;
+import java.util.ArrayList;
 /*
  * @author jdewi
  */
@@ -9,11 +10,17 @@ public class Shift {
     private int shiftId;
     private String shiftType;
     private DailySchedule shiftSchedule;
+    private ArrayList<DailySchedule> payPeriodWeekSchedule;
+    
     
     public Shift(int shiftId, String shiftType, DailySchedule shiftSchedule){
         this.shiftId = shiftId;
         this.shiftType = shiftType;
         this.shiftSchedule = shiftSchedule;
+    }
+    
+    public Shift() {
+        
     }
     
     public LocalTime getStart(){

@@ -125,7 +125,7 @@ public class Punch {
         LocalTime betweenLunchTime = lunchStart.plusMinutes((Duration.between(lunchStart, lunchStop).toMinutes())/2);
         
         int dayItIs = clockTime.get(Calendar.DAY_OF_WEEK);
-
+        
         if (dayItIs != 1 && dayItIs != 7) {
             if ((thisTimeLocalTime.equals(startIntervalTime) || thisTimeLocalTime.isAfter(startIntervalTime)) && (thisTimeLocalTime.isBefore(start) || thisTimeLocalTime.equals(start))) {
                 thisTimeLocalTime = start;

@@ -5,8 +5,7 @@ import java.text.*;
 import org.json.simple.*;
 import java.time.*;
 import java.util.*;
-/**
- *
+/*
  * @author jdewi
  */
 public class TASDatabase {
@@ -14,9 +13,10 @@ public class TASDatabase {
     JSONObject badgesData = new JSONObject();
     JSONObject punchesData = new JSONObject();
     JSONObject punchTypeData = new JSONObject();
-    HashMap<Integer, DailySchedule> dailyScheduleData = new HashMap();
     JSONObject shiftsData = new JSONObject();
     JSONObject shiftsBadgeData = new JSONObject();
+    HashMap<Integer, JSONObject> scheduleOverrideData = new HashMap();
+    HashMap<Integer, DailySchedule> dailyScheduleData = new HashMap();
     private int DAYS_IN_A_WEEK = 7;
     int lowestPunchId = 0;
     int greatestPunchId = 0;
@@ -219,6 +219,47 @@ public class TASDatabase {
                     dailyScheduleData.put((int)currentDailySchedule.get("id"), (DailySchedule)returningDailySchedule);
                 }
                 
+                query = "SELECT id, badgeid, day, dailyscheduleid, UNIX_TIMESTAMP(start) as startdate, UNIX_TIMESTAMP(end) as enddate from scheduleoverride";
+                pstSelect = conn.prepareStatement(query);
+                hasresults = pstSelect.execute();
+                JSONArray rawOverrideData = new JSONArray();
+                /*Execute Selet Query*/
+                while ( hasresults || pstSelect.getUpdateCount() != -1 ) {
+                    if ( hasresults ) {
+                        /* Get ResultSet Metadata */
+                        resultset = pstSelect.getResultSet();
+                        metadata = resultset.getMetaData();
+                        columnCount = metadata.getColumnCount();
+                        /* Get Data; Print as Table Rows */
+                        while(resultset.next()) {
+                            JSONObject currentJSONObject = new JSONObject();
+                            for (int i = 1; i <= columnCount; i++){
+                                if ((metadata.getColumnLabel(i).equals("startdate")) || (metadata.getColumnLabel(i).equals("enddate"))){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (long)(resultset.getLong(i)));
+                                } else if (metadata.getColumnLabel(i).equals("badgeid")){
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (String)(resultset.getString(i)));
+                                } else  {
+                                    currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getInt(i)));
+                                }
+                            }
+                            rawOverrideData.add(currentJSONObject);
+                        }
+                    } else {
+                        resultCount = pstSelect.getUpdateCount();
+                        if ( resultCount == -1 ) {
+                            break;
+                        }
+                    }
+                    /* Check for More Data */
+                    hasresults = pstSelect.getMoreResults();
+                }
+                
+                for (int i = 0; i < rawOverrideData.size(); i++) {
+                    JSONObject currentOverride = (JSONObject)rawOverrideData.get(i);
+                    
+                    this.scheduleOverrideData.put((int)currentOverride.get("id"), (JSONObject) currentOverride);
+                }
+                
                 query = "SELECT * from shift";
                 pstSelect = conn.prepareStatement(query);
                 hasresults = pstSelect.execute();
@@ -255,7 +296,7 @@ public class TASDatabase {
                 for (int i = 0; i < rawShiftData.size(); i++) {
                     JSONObject currentShift = (JSONObject)rawShiftData.get(i);
                     
-                    Shift returningShift = new Shift((int)currentShift.get("id"), (String)currentShift.get("description"), (int)currentShift.get("dailyscheduleid"), (HashMap<Integer, DailySchedule>) dailyScheduleData);
+                    Shift returningShift = new Shift((int)currentShift.get("id"), (String)currentShift.get("description"), (int)currentShift.get("dailyscheduleid"), (HashMap<Integer, DailySchedule>) dailyScheduleData, (HashMap<Integer, JSONObject>) scheduleOverrideData);
                     
                     this.shiftsData.put((int)currentShift.get("id"), (Shift) returningShift);
                 }
@@ -365,6 +406,10 @@ public class TASDatabase {
         return this.greatestPunchId;
     }
     
+    public JSONObject getScheduleOverride() {
+        return (JSONObject)scheduleOverrideData;
+    }
+    
     public ArrayList getDailyPunchList(Badge b, long ts) {
         ArrayList<Punch> returningPunchList = new ArrayList();
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
@@ -448,4 +493,15 @@ public class TASDatabase {
             absenteeismData.put(absenteeismToBeChanged.getBadgeId(), absenteeismToBeChanged);
         }
     }
+    
+    
+    public Boolean checkIfScheduleChanges(long timestamp) {
+        
+        for (int i = 0; i < scheduleOverrideData.size(); i ++) {
+            
+        }
+        
+        return false;
+    }
+    
 }

@@ -23,10 +23,6 @@ public class Shift {
         this.scheduledOverrides = scheduleOverrideData;
     }
     
-    public Shift(){
-        
-    }
-    
     public void setDailyScheduleId(int newDailyScheduleId) {
         this.dailyScheduleId = newDailyScheduleId;
     }
@@ -64,7 +60,9 @@ public class Shift {
     }
     
     public int getInterval() {
-        return this.possibleDailySchedule.get(this.dailyScheduleId).getInterval();
+        DailySchedule test = possibleDailySchedule.get(this.dailyScheduleId);
+        
+        return test.getInterval();
     }
     
     public int getGracePeriod() {
@@ -79,14 +77,73 @@ public class Shift {
         return this.possibleDailySchedule.get(this.dailyScheduleId).getLunchDeduct();
     }
     
-    public void determineIfScheduleShouldChange(long timestamp) {
+    public void determineIfScheduleShouldChange(long timestamp, String badgeid) {
         GregorianCalendar thisCalendar = new GregorianCalendar();
         thisCalendar.setTimeInMillis(timestamp);
         
-        for (int i = 0; i < scheduledOverrides.size(); i++){
-            JSONObject scheduleToCheck = scheduledOverrides.get(i)
-        }
+        //empty Calendar to check with
+        GregorianCalendar defaultCalendar = new GregorianCalendar();
+        defaultCalendar.setTimeInMillis(0);
         
+        for (int i = 0; i < scheduledOverrides.size(); i++){
+            
+            JSONObject scheduleToCheck = (JSONObject) scheduledOverrides.get(i);
+            
+            String overrideBadgeId = (String)scheduleToCheck.get("badgeid");
+            if (overrideBadgeId == null){
+                
+                
+                if ((long)scheduleToCheck.get("enddate") != 0) {
+                    
+                    GregorianCalendar startCheck = new GregorianCalendar();
+                    GregorianCalendar stopCheck = new GregorianCalendar();
+                    
+                    System.out.println(scheduleToCheck.get("startdate"));
+                    System.out.println(scheduleToCheck.get("enddate"));
+                    
+                    startCheck.setTimeInMillis((long) scheduleToCheck.get("startdate"));
+                    stopCheck.setTimeInMillis((long) scheduleToCheck.get("enddate"));
+                    
+                    if (thisCalendar.after(startCheck) && thisCalendar.before(stopCheck)){
+                        this.dailyScheduleId = (int) scheduleToCheck.get("dailyscheduleid");
+                    }
+                } else {
+                    //Making sure it falls on the same day as the override
+                    /*
+                    GregorianCalendar startCheck = new GregorianCalendar();
+                    startCheck.setTimeInMillis((Long) scheduleToCheck.get("startdate"));
+                    if (thisCalendar.after(startCheck) && thisCalendar.get)){
+                        this.dailyScheduleId = (int) scheduleToCheck.get("dailyscheduleid");
+                    }
+                    */
+                }
+            } else {
+                
+            System.out.println("test2");
+                if (badgeid.equals(overrideBadgeId)) {
+                    if ((long)scheduleToCheck.get("enddate") != 0) {
+                        GregorianCalendar startCheck = new GregorianCalendar();
+                        GregorianCalendar stopCheck = new GregorianCalendar();
+
+                        startCheck.setTimeInMillis((Long) scheduleToCheck.get("startdate"));
+                        stopCheck.setTimeInMillis((Long) scheduleToCheck.get("enddate"));
+
+                        if (thisCalendar.after(startCheck) && thisCalendar.before(stopCheck)){
+                            this.dailyScheduleId = (int) scheduleToCheck.get("dailyscheduleid");
+                        }
+                    } else {
+                        //Making sure it falls on the same day as the override
+                        /*
+                        GregorianCalendar startCheck = new GregorianCalendar();
+                        startCheck.setTimeInMillis((Long) scheduleToCheck.get("startdate"));
+                        if (thisCalendar.after(startCheck) && thisCalendar.get)){
+                            this.dailyScheduleId = (int) scheduleToCheck.get("dailyscheduleid");
+                        }
+                        */
+                    }
+                }
+            }
+        }
     }
     
     @Override 

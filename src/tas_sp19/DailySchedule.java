@@ -52,6 +52,7 @@ public class DailySchedule {
     }
     
     public int getInterval() {
+        System.out.println("Trying my best");
         return this.interval;
     }
     
@@ -65,5 +66,10 @@ public class DailySchedule {
     
     public int getLunchDeduct() {
         return this.lunchDeduct;
+    }
+    
+    @Override
+    public String toString() {
+        return "test";
     }
 }

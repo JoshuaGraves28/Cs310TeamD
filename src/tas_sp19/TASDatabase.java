@@ -238,6 +238,7 @@ public class TASDatabase {
                                     currentJSONObject.put(metadata.getColumnLabel(i), (long)(resultset.getLong(i)));
                                 } else if (metadata.getColumnLabel(i).equals("badgeid")){
                                     currentJSONObject.put(metadata.getColumnLabel(i), (String)(resultset.getString(i)));
+                                    //System.out.print    
                                 } else  {
                                     currentJSONObject.put(metadata.getColumnLabel(i), (int)(resultset.getInt(i)));
                                 }
@@ -253,11 +254,11 @@ public class TASDatabase {
                     /* Check for More Data */
                     hasresults = pstSelect.getMoreResults();
                 }
-                
+                int id = 0;
                 for (int i = 0; i < rawOverrideData.size(); i++) {
                     JSONObject currentOverride = (JSONObject)rawOverrideData.get(i);
-                    
-                    this.scheduleOverrideData.put((int)currentOverride.get("id"), (JSONObject) currentOverride);
+                    this.scheduleOverrideData.put(id, (JSONObject) currentOverride);
+                    id++;
                 }
                 
                 query = "SELECT * from shift";
@@ -295,9 +296,7 @@ public class TASDatabase {
                 
                 for (int i = 0; i < rawShiftData.size(); i++) {
                     JSONObject currentShift = (JSONObject)rawShiftData.get(i);
-                    
-                    Shift returningShift = new Shift((int)currentShift.get("id"), (String)currentShift.get("description"), (int)currentShift.get("dailyscheduleid"), (HashMap<Integer, DailySchedule>) dailyScheduleData, (HashMap<Integer, JSONObject>) scheduleOverrideData);
-                    
+                    Shift returningShift = new Shift((int)currentShift.get("id"), (String)currentShift.get("description"), (int)currentShift.get("dailyscheduleid"), (HashMap<Integer, DailySchedule>) this.dailyScheduleData, (HashMap<Integer, JSONObject>) this.scheduleOverrideData);
                     this.shiftsData.put((int)currentShift.get("id"), (Shift) returningShift);
                 }
                 
@@ -395,8 +394,9 @@ public class TASDatabase {
     
     public Shift getShift(Badge badge, long timestamp) {
      
-        Shift nullShift = new Shift();
-        return nullShift;
+        Shift returningShift = getShift(badge);
+        returningShift.determineIfScheduleShouldChange(timestamp, badge.getId());
+        return returningShift;
     }
     
     public int insertPunch(Punch punchToBeInserted) {
@@ -493,15 +493,4 @@ public class TASDatabase {
             absenteeismData.put(absenteeismToBeChanged.getBadgeId(), absenteeismToBeChanged);
         }
     }
-    
-    
-    public Boolean checkIfScheduleChanges(long timestamp) {
-        
-        for (int i = 0; i < scheduleOverrideData.size(); i ++) {
-            
-        }
-        
-        return false;
-    }
-    
 }

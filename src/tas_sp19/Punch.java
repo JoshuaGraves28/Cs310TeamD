@@ -103,6 +103,8 @@ public class Punch {
         GregorianCalendar clockTime = new GregorianCalendar();
         clockTime.setTimeInMillis(this.originalTimeStamp);
         
+        s.determineIfScheduleShouldChange(originalTimeStamp, this.getBadgeid());
+        
         int interval = s.getInterval();
         int gracePeriod = s.getGracePeriod();
         int dock = s.getDock();
